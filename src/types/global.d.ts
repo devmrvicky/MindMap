@@ -1,0 +1,47 @@
+export {};
+
+declare global {
+  interface Chat {
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    chatRoomId: string;
+  }
+
+  interface Model {
+    name: string;
+    model: string;
+    label: "free" | "paid";
+  }
+
+  interface StoreState {
+    chatsHistory: Chat[];
+    addNewChat: (newChat: Chat) => void;
+    currentChatsHistory: Chat[];
+    setCurrentChatsHistory: (chats: Chat[]) => void;
+    isResponseLoading: boolean;
+    setIsResponseLoading: (isLoading: boolean) => void;
+    LLMResponsedError: string;
+    models: Model[];
+    setLLMResponsedError: (error: string) => void;
+    currentLLMModel: string;
+    changeCurrentLLMModel: (model: string) => void;
+    chatRooms: ChatRoom[];
+    activeChatRoom: ActiveChatRoom;
+    setActiveChatRoom: (chatRoom: ChatRoom) => void;
+    createNewChatRoom: (newChatRoom: ChatRoom) => void;
+  }
+
+  interface Chats {
+    id: string;
+    chatsHistory: Chat[];
+  }
+
+  // chat room
+  interface ChatRoom {
+    id: string;
+    chatRoomName: string;
+  }
+
+  type ActiveChatRoom = ChatRoom | null;
+}
