@@ -24,7 +24,7 @@ const useChatStore = create<StoreState>((set) => ({
   ],
   activeChatRoom: null,
   isChatRoomActive: false,
-  setActiveChatRoom: (chatRoom: ChatRoom) =>
+  setActiveChatRoom: (chatRoom: ActiveChatRoom) =>
     set(() => {
       console.log("from store", chatRoom);
       return { activeChatRoom: chatRoom };

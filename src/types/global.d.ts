@@ -28,7 +28,7 @@ declare global {
     changeCurrentLLMModel: (model: string) => void;
     chatRooms: ChatRoom[];
     activeChatRoom: ActiveChatRoom;
-    setActiveChatRoom: (chatRoom: ChatRoom) => void;
+    setActiveChatRoom: (chatRoom: ActiveChatRoom) => void;
     createNewChatRoom: (newChatRoom: ChatRoom) => void;
   }
 

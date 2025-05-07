@@ -1,8 +1,7 @@
 import * as React from "react";
-import { Frame, History, Map, PieChart } from "lucide-react";
 
 import { NavMain } from "@/components/NavMain";
-import { NavUser } from "@/components/NavUser";
+
 import {
   Sidebar,
   SidebarContent,
