@@ -17,7 +17,7 @@ const ChatUI = () => {
       <div
         className={`max-w-[900px] mx-auto p-4 h-full flex items-center  flex-col ${
           isMobile ? "pb-0 justify-end" : "justify-center"
-        }`}
+        } ${currentChatsHistory.length > 0 ? "justify-end items-center" : ""}`}
       >
         {!currentChatsHistory.length && <GreetingMessageComp />}
 

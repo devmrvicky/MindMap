@@ -35,7 +35,7 @@ export function NavMain() {
               </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <SidebarMenuSub>
+              <SidebarMenuSub className="p-0">
                 <NavProjects />
               </SidebarMenuSub>
             </CollapsibleContent>

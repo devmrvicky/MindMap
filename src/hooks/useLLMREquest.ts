@@ -3,6 +3,7 @@ import { useChatStore } from "@/zustand/store";
 import { useEffect } from "react";
 import { v1 as uuidv1 } from "uuid";
 import { useParams, useNavigate } from "react-router";
+import { updateData } from "@/indexDB/indexDB";
 
 const useLLMRequest = () => {
   const {
@@ -55,6 +56,11 @@ Logic:
           chatRoomName: prompt,
         };
         createNewChatRoom(newChatRoom);
+        // create new chat room in indexDB
+        updateData({
+          data: newChatRoom,
+          storeName: "chatRoom",
+        });
         userChat = {
           id: uuidv1(),
           role: "user",
@@ -73,7 +79,11 @@ Logic:
       }
 
       addNewChat(userChat);
-
+      // create new chat in indexDB
+      updateData({
+        data: userChat,
+        storeName: "chat",
+      });
       // set the response loading state to true
       setIsResponseLoading(true);
       // make the post request to the server to get the response from the LLM
@@ -107,6 +117,11 @@ Logic:
       };
 
       addNewChat(assistantChat);
+      // create new chat in indexDB
+      updateData({
+        data: assistantChat,
+        storeName: "chat",
+      });
       // set the response loading state to false
       setIsResponseLoading(false);
       return content;
@@ -127,6 +142,7 @@ Logic:
         setActiveChatRoom(chatRoom);
         setCurrentChatsHistory(
           chatsHistory.filter((chat) => chat.chatRoomId === chatRoom.id)
+          // .reverse()
         );
         // updateActiveChatRoom(chatRoom.id, currentChatsHistory);
         // setIsChatRoomActive(true);

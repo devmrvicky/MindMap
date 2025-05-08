@@ -3,6 +3,10 @@ import { create } from "zustand";
 const useChatStore = create<StoreState>((set) => ({
   chatsHistory: [],
   currentChatsHistory: [],
+  setChatsHistory: (chats: Chat[]) => set(() => ({
+    chatsHistory: chats,
+
+  })),
   addNewChat: (newChat: Chat) =>
     set((state) => ({
       chatsHistory: [...state.chatsHistory, newChat],
@@ -24,6 +28,7 @@ const useChatStore = create<StoreState>((set) => ({
   ],
   activeChatRoom: null,
   isChatRoomActive: false,
+  setChatRooms: (chatRooms: ChatRoom[]) => set(() => ({chatRooms: chatRooms})),
   setActiveChatRoom: (chatRoom: ActiveChatRoom) =>
     set(() => {
       console.log("from store", chatRoom);

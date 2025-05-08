@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { useChatStore } from "@/zustand/store";
 
 const Logo = () => {
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [currentLogoIcon, setCurrentLogoIcon] = useState(logoPng);
   const navigate = useNavigate();
   const { setActiveChatRoom, setCurrentChatsHistory } = useChatStore(
@@ -14,8 +15,17 @@ const Logo = () => {
   return (
     <div
       className="flex items-center gap-2 p-2 justify-center cursor-pointer"
-      onMouseEnter={() => setCurrentLogoIcon(logoGif)}
-      onMouseLeave={() => setCurrentLogoIcon(logoPng)}
+      onMouseEnter={() => {
+        setTimeoutId(
+          setTimeout(() => {
+            setCurrentLogoIcon(logoGif);
+          }, 1000)
+        );
+      }}
+      onMouseLeave={() => {
+        setCurrentLogoIcon(logoPng);
+        if (timeoutId) clearTimeout(timeoutId);
+      }}
       onClick={() => {
         navigate("/");
         setActiveChatRoom(null);

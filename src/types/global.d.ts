@@ -16,6 +16,7 @@ declare global {
 
   interface StoreState {
     chatsHistory: Chat[];
+    setChatsHistory: (chats: Chat[]) => void;
     addNewChat: (newChat: Chat) => void;
     currentChatsHistory: Chat[];
     setCurrentChatsHistory: (chats: Chat[]) => void;
@@ -27,6 +28,7 @@ declare global {
     currentLLMModel: string;
     changeCurrentLLMModel: (model: string) => void;
     chatRooms: ChatRoom[];
+    setChatRooms: (chatRooms: ChatRoom[]) => void;
     activeChatRoom: ActiveChatRoom;
     setActiveChatRoom: (chatRoom: ActiveChatRoom) => void;
     createNewChatRoom: (newChatRoom: ChatRoom) => void;
@@ -44,4 +46,7 @@ declare global {
   }
 
   type ActiveChatRoom = ChatRoom | null;
+
+  type storeName = "chat" | "chatRoom";
+  type Data = Chat | ChatRoom;
 }

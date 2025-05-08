@@ -46,7 +46,9 @@ export function NavProjects() {
                 }`}
               >
                 <SidebarMenuButton asChild>
-                  <span>{chatRoom.chatRoomName}</span>
+                  <span className="truncate" title={chatRoom.chatRoomName}>
+                    {chatRoom.chatRoomName}
+                  </span>
                 </SidebarMenuButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
