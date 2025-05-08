@@ -3,11 +3,9 @@ import { useChatStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const ChatInput = () => {
   const [prompt, setPrompt] = useState<string>("");
-  const isMobile = useIsMobile();
 
   const { getLLMResponse } = useLLMRequest();
   const { currentChatsHistory } = useChatStore((state) => state);
@@ -30,20 +28,6 @@ const ChatInput = () => {
           : ""
       }`}
     >
-      {/* <Input
-        type="text"
-        placeholder="Ask me anything..."
-        className="border-none focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-transparent p-6 py-8 inline-block placeholder:text-2xl placeholder:text-muted-foreground text-2xl"
-        autoFocus
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && prompt.trim()) {
-            handleSendChatRequest(prompt);
-            setPrompt("");
-          }
-        }}
-      /> */}
       <Textarea
         placeholder="Ask me anything..."
         className="rounded-2xl h-[100px] w-[95%] shadow-2xl"
