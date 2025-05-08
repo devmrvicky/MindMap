@@ -62,7 +62,7 @@ const GreetingMessageComp = () => {
     setRandomGreetingMessage(greetingMessages[randomIndex]);
   }, []);
   return (
-    <h1 className="text-3xl py-4 font-medium italic">
+    <h1 className="text-2xl py-4 font-medium italic text-center">
       {randomGreetingMessage}
     </h1>
   );
