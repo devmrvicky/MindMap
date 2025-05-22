@@ -6,6 +6,7 @@ declare global {
     role: "user" | "assistant";
     content: string;
     chatRoomId: string;
+    usedModel: string
   }
 
   interface Model {
@@ -31,7 +32,8 @@ declare global {
     setChatRooms: (chatRooms: ChatRoom[]) => void;
     activeChatRoom: ActiveChatRoom;
     setActiveChatRoom: (chatRoom: ActiveChatRoom) => void;
-    createNewChatRoom: (newChatRoom: ChatRoom) => void;
+    createNewChatRoomOnLocal: (newChatRoom: ChatRoom) => void;
+    deleteChatRoomFromLocal: (id: string) => void;
   }
 
   interface Chats {
@@ -41,12 +43,42 @@ declare global {
 
   // chat room
   interface ChatRoom {
-    id: string;
+    chatRoomId: string;
     chatRoomName: string;
+    userId: string
   }
 
   type ActiveChatRoom = ChatRoom | null;
 
   type storeName = "chat" | "chatRoom";
   type Data = Chat | ChatRoom;
+
+  // user store types
+  // interface UserStoreState {
+  //   user: User | null;
+  //   // setUser: (user: User) => void;
+  //   isLoggedIn: boolean;
+  //   login: (user: User | null) => void;
+  //   logout: () => void;
+  //   canUseWithoutAuth: boolean;
+  //   setCanUseWithoutAuth: (canUse: boolean) => void;
+  // }
+
+  interface AuthStoreState {
+    user: User | null;
+    isLoggedIn: boolean;
+    login: (user: User | null) => void;
+    logout: () => void;
+    canUseWithoutAuth: boolean;
+    setCanUseWithoutAuth: (canUse: boolean) => void;
+  }
+
+  interface User {
+    _id: string; // MongoDB document ID
+    name: string;
+    email: string;
+    authType: "google" | "github" | "email";
+    profilePic: string;
+    password: string;
+  }
 }

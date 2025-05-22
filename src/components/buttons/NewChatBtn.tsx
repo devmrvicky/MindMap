@@ -1,7 +1,7 @@
 import { PenLine } from "lucide-react";
-import { Button } from "./ui/button";
 import { useNavigate } from "react-router";
 import { useChatStore } from "@/zustand/store";
+import { Button } from "../ui/button";
 
 const NewChatBtn = () => {
   const navigate = useNavigate();
@@ -10,7 +10,6 @@ const NewChatBtn = () => {
   );
 
   const handleClickOnNewChatButton = () => {
-    console.log("new chat button clicked");
     navigate("/");
     setActiveChatRoom(null);
     setCurrentChatsHistory([]); // Reset the active chat room to null

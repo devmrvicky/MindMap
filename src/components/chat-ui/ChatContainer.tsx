@@ -26,10 +26,6 @@ const ChatContainer = () => {
     scrollToBottom();
   }, [currentChatsHistory]);
 
-  // const currentChatsHistory = activeChatRoom?.chats || [];
-
-  console.log("current history from chat container", { currentChatsHistory });
-
   return (
     <div
       className="flex flex-col gap-4 w-full h-full overflow-y-auto"

@@ -6,12 +6,12 @@ function openDB(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, 1);
 
     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-      console.log("creating object store");
+      // console.log("creating object store");
       const db: IDBDatabase = (event.target as IDBOpenDBRequest).result;
       storeNames.forEach((storeName: storeName) => {
         if (!db.objectStoreNames.contains(storeName)) {
           db.createObjectStore(storeName, {
-            keyPath: "id",
+            keyPath: storeName === "chatRoom" ? "chatRoomId" : "id",
             // autoIncrement: false,
           });
         }
@@ -63,7 +63,10 @@ export async function updateData({
       "readwrite"
     );
     const store: IDBObjectStore = transaction.objectStore(storeName);
-    const request = store.put(data);
+    // console.log(data);
+    const request = store.put(
+      storeName === "chatRoom" ? { id: data.chatRoomId, ...data } : data
+    );
 
     request.onsuccess = () => {
       resolve(request.result);
@@ -90,7 +93,7 @@ export async function deleteData({
     // console.log(request);
 
     request.onsuccess = () => {
-      console.log(`id: ${id}: deleted`);
+      // console.log(`id: ${id}: deleted`);
       resolve(request.result);
     };
 

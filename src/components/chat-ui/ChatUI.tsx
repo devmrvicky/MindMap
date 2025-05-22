@@ -6,7 +6,7 @@ import { useChatStore } from "@/zustand/store";
 
 const ChatUI = () => {
   const { currentChatsHistory } = useChatStore((state) => state);
-  //  const currentChatsHistory = activeChatRoom?.chats || [];
+
   const isMobile = useIsMobile();
 
   return (

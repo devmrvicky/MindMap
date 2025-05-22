@@ -15,8 +15,9 @@ import {
   // SidebarMenuSubButton,
   // SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { NavProjects } from "./NavProjects";
-import NewChatBtn from "./NewChatBtn";
+import { NavChatRooms } from "./NavChatRooms";
+import NewChatBtn from "./buttons/NewChatBtn";
+// import NewChatBtn from "./NewChatBtn";
 
 export function NavMain() {
   return (
@@ -36,7 +37,7 @@ export function NavMain() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarMenuSub className="p-0">
-                <NavProjects />
+                <NavChatRooms />
               </SidebarMenuSub>
             </CollapsibleContent>
           </SidebarMenuItem>

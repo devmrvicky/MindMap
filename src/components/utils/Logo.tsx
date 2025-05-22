@@ -1,29 +1,31 @@
-import logoPng from "../assets/mind-map.png";
-import logoGif from "../assets/mind-map.gif";
+import logoPng from "@/assets/mind-map.png";
+import logoGif from "@/assets/mind-map.gif";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useChatStore } from "@/zustand/store";
 
-const Logo = () => {
+const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const [currentLogoIcon, setCurrentLogoIcon] = useState(logoPng);
+  const [currentLogoIcon, setCurrentLogoIcon] = useState(
+    isIconSpin ? logoGif : logoPng
+  );
   const navigate = useNavigate();
   const { setActiveChatRoom, setCurrentChatsHistory } = useChatStore(
     (store) => store
   );
 
   return (
-    <div
-      className="flex items-center gap-2 p-2 justify-center cursor-pointer"
+    <button
+      className="flex items-center gap-2 p-2 justify-center cursor-pointer outline-none"
       onMouseEnter={() => {
         setTimeoutId(
           setTimeout(() => {
-            setCurrentLogoIcon(logoGif);
+            setCurrentLogoIcon(isIconSpin ? logoPng : logoGif);
           }, 1000)
         );
       }}
       onMouseLeave={() => {
-        setCurrentLogoIcon(logoPng);
+        setCurrentLogoIcon(isIconSpin ? logoGif : logoPng);
         if (timeoutId) clearTimeout(timeoutId);
       }}
       onClick={() => {
@@ -40,7 +42,7 @@ const Logo = () => {
       <h1 className="text-2xl p-1">
         <b>Mind</b>Map
       </h1>
-    </div>
+    </button>
   );
 };
 

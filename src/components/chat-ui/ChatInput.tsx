@@ -3,13 +3,17 @@ import { useChatStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { useState } from "react";
-import { ArrowUp, Paperclip } from "lucide-react";
+import { ArrowUp, Globe, ImagePlus, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Label } from "@/components/ui/label";
+import LoginDialog from "../LoginDialog";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const ChatInput = () => {
   const [prompt, setPrompt] = useState<string>("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { getLLMResponse } = useLLMRequest();
   const { currentChatsHistory } = useChatStore((state) => state);
@@ -18,10 +22,12 @@ const ChatInput = () => {
 
   const handleSendChatRequest = async (prompt: string) => {
     try {
-      await getLLMResponse(prompt);
+      await getLLMResponse(prompt, () => setDialogOpen(true));
     } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message);
+      }
       console.error("Error sending chat request:", error);
-      // Handle error appropriately, e.g., show a notification to the user
     }
   };
 
@@ -52,7 +58,7 @@ const ChatInput = () => {
       />
       <div className="flex w-full">
         {/* <p>tools</p> */}
-        <div>
+        <div className="flex items-center justify-center gap-1">
           <Label
             htmlFor="file-upload"
             className="bg-white border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
@@ -75,6 +81,20 @@ const ChatInput = () => {
               }
             }}
           />
+          {/* internet button */}
+          <Button
+            variant="outline"
+            className="bg-white border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
+          >
+            <Globe />
+          </Button>
+          {/* image creation button */}
+          <Button
+            variant="outline"
+            className="bg-white border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
+          >
+            <ImagePlus />
+          </Button>
         </div>
         <Button
           variant="outline"
@@ -90,6 +110,8 @@ const ChatInput = () => {
           <ArrowUp className="min-w-2 min-h-2" />
         </Button>
       </div>
+      {/* login dialog component */}
+      <LoginDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   );
 };

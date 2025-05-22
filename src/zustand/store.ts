@@ -1,12 +1,13 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 const useChatStore = create<StoreState>((set) => ({
   chatsHistory: [],
   currentChatsHistory: [],
-  setChatsHistory: (chats: Chat[]) => set(() => ({
-    chatsHistory: chats,
-
-  })),
+  setChatsHistory: (chats: Chat[]) =>
+    set(() => ({
+      chatsHistory: chats,
+    })),
   addNewChat: (newChat: Chat) =>
     set((state) => ({
       chatsHistory: [...state.chatsHistory, newChat],
@@ -28,13 +29,14 @@ const useChatStore = create<StoreState>((set) => ({
   ],
   activeChatRoom: null,
   isChatRoomActive: false,
-  setChatRooms: (chatRooms: ChatRoom[]) => set(() => ({chatRooms: chatRooms})),
+  setChatRooms: (chatRooms: ChatRoom[]) =>
+    set(() => ({ chatRooms: chatRooms })),
   setActiveChatRoom: (chatRoom: ActiveChatRoom) =>
     set(() => {
-      console.log("from store", chatRoom);
+      // console.log("from store", chatRoom);
       return { activeChatRoom: chatRoom };
     }),
-  createNewChatRoom: (newChatRoom: ChatRoom) =>
+  createNewChatRoomOnLocal: (newChatRoom: ChatRoom) =>
     set((state) => {
       // console.log("creating new chat room", newChatRoom);
       return {
@@ -43,6 +45,17 @@ const useChatStore = create<StoreState>((set) => ({
         chatRooms: [...state.chatRooms, newChatRoom],
       };
     }),
+  deleteChatRoomFromLocal: (id: string) =>
+    set((state) => ({
+      chatRooms: state.chatRooms.filter(
+        (chatRoom) => chatRoom.chatRoomId !== id
+      ),
+      chatsHistory: state.chatsHistory.filter((chat) => chat.chatRoomId !== id),
+      currentChatsHistory: state.activeChatRoom
+        ? []
+        : state.currentChatsHistory,
+      activeChatRoom: state.activeChatRoom ? null : state.activeChatRoom,
+    })),
 
   isResponseLoading: false,
   setIsResponseLoading: (isLoading: boolean) =>
@@ -104,4 +117,64 @@ const useChatStore = create<StoreState>((set) => ({
     })),
 }));
 
-export { useChatStore };
+// const useAuthStore = create((set) => ({
+//   user: null,
+//   isLoggedIn: false,
+//   login: (user: User | null) =>
+//     set(() => {
+//       return {
+//         user: user,
+//         isLoggedIn: true,
+//       };
+//     }),
+//   logout: () =>
+//     set(() => {
+//       return {
+//         user: null,
+//         isLoggedIn: false,
+//       };
+//     }),
+//   canUseWithoutAuth: true,
+//   setCanUseWithoutAuth: (canUse: boolean) =>
+//     set(() => {
+//       return {
+//         canUseWithoutAuth: canUse,
+//       };
+//     }),
+// }));
+
+const useAuthStore = create<AuthStoreState>()(
+  persist<AuthStoreState>(
+    (set) => ({
+      user: null,
+      isLoggedIn: false,
+      login: (user: User | null) =>
+        set(() => {
+          return {
+            user: user,
+            isLoggedIn: true,
+          };
+        }),
+      logout: () =>
+        set(() => {
+          return {
+            user: null,
+            isLoggedIn: false,
+          };
+        }),
+      canUseWithoutAuth: true,
+      setCanUseWithoutAuth: (canUse: boolean) =>
+        set(() => {
+          return {
+            canUseWithoutAuth: canUse,
+          };
+        }),
+    }),
+    {
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+export { useChatStore, useAuthStore };

@@ -1,10 +1,10 @@
-import { Folder, Forward, MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -18,18 +18,27 @@ import {
 } from "@/components/ui/sidebar";
 import { useChatStore } from "@/zustand/store";
 import { useNavigate, useParams } from "react-router";
+import useDeleteData from "@/hooks/useDeleteData";
 
-export function NavProjects() {
+export function NavChatRooms() {
   const { isMobile } = useSidebar();
   const { chatRooms } = useChatStore((store) => store);
+
+  const { deleteChatRoom } = useDeleteData();
 
   const navigate = useNavigate();
   const { chatRoomId } = useParams();
 
   const handleClickOnChatRoom = (id: string) => {
-    console.log("chat room id", id);
     navigate(`/c/${id}`);
-    // setActiveChatRoom(id);
+  };
+
+  const handleDeleteChatRoom = async (
+    e: React.MouseEvent<HTMLDivElement>,
+    id: string
+  ): Promise<void> => {
+    e.stopPropagation();
+    await deleteChatRoom({ chatRoomIds: [id] });
   };
 
   return (
@@ -39,10 +48,10 @@ export function NavProjects() {
         {chatRooms.length
           ? chatRooms.map((chatRoom) => (
               <SidebarMenuItem
-                key={chatRoom.chatRoomName}
-                onClick={() => handleClickOnChatRoom(chatRoom.id)}
+                key={chatRoom.chatRoomId}
+                onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
                 className={`cursor-pointer ${
-                  chatRoomId === chatRoom.id ? "bg-sidebar-accent" : ""
+                  chatRoomId === chatRoom.chatRoomId ? "bg-sidebar-accent" : ""
                 }`}
               >
                 <SidebarMenuButton asChild>
@@ -58,22 +67,18 @@ export function NavProjects() {
                     </SidebarMenuAction>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-48 rounded-lg"
+                    className="w-auto rounded-lg"
                     side={isMobile ? "bottom" : "right"}
                     align={isMobile ? "end" : "start"}
                   >
-                    <DropdownMenuItem>
-                      <Folder className="text-muted-foreground" />
-                      <span>View Project</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Forward className="text-muted-foreground" />
-                      <span>Share Project</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={(e) =>
+                        handleDeleteChatRoom(e, chatRoom.chatRoomId)
+                      }
+                    >
                       <Trash2 className="text-muted-foreground" />
-                      <span>Delete Project</span>
+                      <span>Delete</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

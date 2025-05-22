@@ -9,20 +9,21 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import Logo from "./Logo";
+import Logo from "./utils/Logo";
+import { useAuthStore } from "@/zustand/store";
+import { NavUser } from "./NavUser";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthStore((store) => store);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        {/* <TeamSwitcher teams={data.teams} /> */}
         <Logo />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
-      <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
+      <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

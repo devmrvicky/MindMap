@@ -3,28 +3,27 @@ import { useChatStore } from "@/zustand/store";
 import { useEffect } from "react";
 import { v1 as uuidv1 } from "uuid";
 import { useParams, useNavigate } from "react-router";
-import { updateData } from "@/indexDB/indexDB";
+import useCreateData from "./useCreateData";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const useLLMRequest = () => {
   const {
     chatsHistory,
     currentChatsHistory,
-    addNewChat,
     setCurrentChatsHistory,
     setIsResponseLoading,
     setLLMResponsedError,
     currentLLMModel,
     activeChatRoom,
     setActiveChatRoom,
-    createNewChatRoom,
     chatRooms,
   } = useChatStore((state) => state);
 
+  const { createChatRoom, createChat } = useCreateData();
+
   const navigate = useNavigate();
   const param = useParams();
-  // const chatRoom = chatRooms.find(
-  //   (chatRoom) => chatRoom.id === param.chatRoomId
-  // );
 
   /*
 Logic:
@@ -44,50 +43,34 @@ Logic:
 
 */
 
-  async function getLLMResponse(prompt: string): Promise<string | undefined> {
+  async function getLLMResponse(
+    prompt: string,
+    onLimitReached?: () => void
+  ): Promise<string | undefined> {
     try {
-      let activeChatRoomId = param.chatRoomId || activeChatRoom?.id;
-      let userChat: Chat;
+      let activeChatRoomId = param.chatRoomId || activeChatRoom?.chatRoomId;
+
+      // let userChat: Chat;
       if (!activeChatRoomId) {
         // create a new chat room if there is no active chat room
         activeChatRoomId = uuidv1();
-        const newChatRoom: ChatRoom = {
-          id: activeChatRoomId,
-          chatRoomName: prompt,
-        };
-        createNewChatRoom(newChatRoom);
-        // create new chat room in indexDB
-        updateData({
-          data: newChatRoom,
-          storeName: "chatRoom",
+        // * this function is responsible for creating chat room in indexDB mongoDB and also update local zustand store
+        const res = await createChatRoom({
+          activeChatRoomId,
+          prompt,
+          onLimitReached,
         });
-        userChat = {
-          id: uuidv1(),
-          role: "user",
-          content: prompt,
-          chatRoomId: activeChatRoomId,
-        };
+        // console.log(res);
+        if (res === "LIMIT_RICHED") return;
         navigate(`/c/${activeChatRoomId}`); // navigate to the new chat room
-      } else {
-        // if there is an active chat room, create a new user chat and add the chat room id to the chat
-        userChat = {
-          id: uuidv1(),
-          role: "user",
-          content: prompt,
-          chatRoomId: activeChatRoomId,
-        };
       }
 
-      addNewChat(userChat);
-      // create new chat in indexDB
-      updateData({
-        data: userChat,
-        storeName: "chat",
-      });
+      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store
+      await createChat({ activeChatRoomId, prompt, role: "user" });
       // set the response loading state to true
       setIsResponseLoading(true);
       // make the post request to the server to get the response from the LLM
-      const response = await axiosConfig.post("/generate-response", {
+      const response = await axiosConfig.post("/chat/generate", {
         query: prompt,
         model: currentLLMModel,
         prevResponse: JSON.stringify(
@@ -107,25 +90,22 @@ Logic:
         return response.data;
       }
       const content = response.data.response.choices[0].message.content;
-      // const content = response.data.message;
 
-      const assistantChat: Chat = {
-        id: uuidv1(),
+      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store
+      await createChat({
+        activeChatRoomId,
+        prompt: content,
         role: "assistant",
-        content: content,
-        chatRoomId: activeChatRoomId,
-      };
-
-      addNewChat(assistantChat);
-      // create new chat in indexDB
-      updateData({
-        data: assistantChat,
-        storeName: "chat",
       });
       // set the response loading state to false
       setIsResponseLoading(false);
       return content;
     } catch (error) {
+      if(error instanceof AxiosError){
+        toast.error(error.response?.data.message, {
+          toastId: "chat request error"
+        })
+      }
       console.error("Error sending chat request:", error);
       setIsResponseLoading(false);
       return undefined;
@@ -135,18 +115,31 @@ Logic:
   useEffect(() => {
     if (param.chatRoomId) {
       const chatRoom = chatRooms.find(
-        (chatRoom) => chatRoom.id === param.chatRoomId
+        (chatRoom) => chatRoom.chatRoomId === param.chatRoomId
       );
-      console.log("chat room from useEffect", chatRoom);
       if (chatRoom) {
         setActiveChatRoom(chatRoom);
         setCurrentChatsHistory(
-          chatsHistory.filter((chat) => chat.chatRoomId === chatRoom.id)
+          chatsHistory.filter((chat) => chat.chatRoomId === chatRoom.chatRoomId)
           // .reverse()
         );
+        // when any chatroom will be active then in background this code will get all chats from mongoDB and update current chat history
+        // axiosConfig
+        //   .get(`/chat/${chatRoom.chatRoomId}`)
+        //   .then((res) => {
+        //     const chats = res.data.chats;
+        //     setCurrentChatsHistory(chats);
+        //   })
+        //   .catch((error) => {
+        //     if (error instanceof AxiosError) {
+        //       toast.error(error.response?.data.message);
+        //     }
+        //     console.error(error);
+        //   });
         // updateActiveChatRoom(chatRoom.id, currentChatsHistory);
         // setIsChatRoomActive(true);
       } else {
+        // setCurrentChatsHistory([]);
         // If the chat room is not found, you can handle it accordingly (e.g., show an error message or redirect)
         console.error("Chat room not found");
         navigate("/"); // Redirect to home or another page
