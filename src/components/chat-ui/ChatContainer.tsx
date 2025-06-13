@@ -1,43 +1,35 @@
 import { useChatStore } from "@/zustand/store";
 import Chat from "./Chat";
 import Loading from "../utils/Loading";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useEffect } from "react";
 
 const ChatContainer = () => {
   const { isResponseLoading, currentChatsHistory } = useChatStore(
     (state) => state
   );
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  console.log("chats from chat container ", currentChatsHistory);
+  const chatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    function scrollToBottom() {
-      const chatContainer = chatContainerRef.current;
-
-      // Scroll logic
-      if (chatContainer) {
-        // Use smooth scrolling for better UX
-        chatContainer.scrollTo({
-          top: chatContainer.scrollHeight,
-          behavior: "smooth",
-        });
+    setTimeout(() => {
+      if (chatRef.current) {
+        chatRef.current.scrollIntoView({ behavior: "smooth" });
       }
-    }
-    scrollToBottom();
+    }, 0);
   }, [currentChatsHistory]);
 
   return (
-    <div
-      className="flex flex-col gap-4 w-full h-full overflow-y-auto"
-      ref={chatContainerRef}
-    >
+    <div className="flex flex-col gap-4 w-full h-screen overflow-y-auto">
       {currentChatsHistory.map((message, index) => (
         <Chat
-          key={message.id}
+          key={message.chatId}
           message={message}
           index={index}
           totalChats={currentChatsHistory.length}
           isLLmResponseLoading={isResponseLoading}
+          chatRef={chatRef}
         />
       ))}
 

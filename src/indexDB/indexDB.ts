@@ -65,7 +65,11 @@ export async function updateData({
     const store: IDBObjectStore = transaction.objectStore(storeName);
     // console.log(data);
     const request = store.put(
-      storeName === "chatRoom" ? { id: data.chatRoomId, ...data } : data
+      storeName === "chatRoom"
+        ? { id: (data as ChatRoom).chatRoomId, ...data }
+        : storeName === "chat"
+        ? { id: (data as Chat).chatId, ...data }
+        : data // this expression is useful because chat room data does not contain id; chat room has chatRoomId and indexDB is supposed to have id for storing data.
     );
 
     request.onsuccess = () => {
@@ -102,6 +106,100 @@ export async function deleteData({
     };
 
     transaction.oncomplete = () => {
+      db.close();
+    };
+  });
+}
+
+// delete all data from a given store
+export async function clearStore(storeName: storeName): Promise<void> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], "readwrite");
+    const store = transaction.objectStore(storeName);
+    const request = store.clear();
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    request.onerror = () => {
+      reject(request.error);
+    };
+
+    transaction.oncomplete = () => {
+      db.close();
+    };
+  });
+}
+
+// set all data to a given store
+export async function setAllData({
+  data,
+  storeName,
+}: {
+  data: Data[];
+  storeName: storeName;
+}): Promise<void> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([storeName], "readwrite");
+    const store = transaction.objectStore(storeName);
+
+    // First clear the store
+    const clearRequest = store.clear();
+    clearRequest.onsuccess = () => {
+      // Then add all new data
+      let addCount = 0;
+      if (data.length === 0) {
+        resolve();
+        db.close();
+        return;
+      }
+      data.forEach((item) => {
+        const putRequest = store.put(
+          storeName === "chatRoom" ? { id: item.chatRoomId, ...item } : item
+        );
+        putRequest.onsuccess = () => {
+          addCount++;
+          if (addCount === data.length) {
+            resolve();
+            db.close();
+          }
+        };
+        putRequest.onerror = () => {
+          reject(putRequest.error);
+          db.close();
+        };
+      });
+    };
+    clearRequest.onerror = () => {
+      reject(clearRequest.error);
+      db.close();
+    };
+  });
+}
+
+// write a function that fetch chats that have a specific chat room id
+export async function getChatsByChatRoomId(
+  chatRoomId: string
+): Promise<Chat[]> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["chat"], "readonly");
+    const store = transaction.objectStore("chat");
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const chats = (request.result as Chat[]).filter(
+        (chat) => chat.chatRoomId === chatRoomId
+      );
+      resolve(chats);
+      db.close();
+    };
+
+    request.onerror = () => {
+      reject(request.error);
       db.close();
     };
   });

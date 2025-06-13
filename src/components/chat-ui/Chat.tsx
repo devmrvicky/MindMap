@@ -1,22 +1,29 @@
 import Markdown from "react-markdown";
+import { RefObject } from "react";
+import { ChevronRight } from "lucide-react";
+import { Collapsible } from "@radix-ui/react-collapsible";
+import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 
 const Chat = ({
   message,
   index,
   totalChats,
   isLLmResponseLoading,
+  chatRef,
 }: {
   message: Chat;
   index: number;
   totalChats: number;
   isLLmResponseLoading: boolean;
+  chatRef: RefObject<HTMLDivElement | null>;
 }) => {
   return (
     <div
-      key={message.id}
+      key={message.chatId}
       className={`flex ${
         message.role === "user" ? "justify-end" : "justify-star"
       }`}
+      ref={chatRef}
     >
       <div
         className={` max-w-fit ${
@@ -29,7 +36,26 @@ const Chat = ({
             : "bg-inherit text-gray-800 rounded-bl-none"
         }`}
       >
-        <Markdown>{message.content}</Markdown>
+        {message.role === "assistant" ? (
+          message.content.includes("</think>") ? (
+            <>
+              <Collapsible defaultOpen={false} className="group/collapsible">
+                <CollapsibleTrigger className="flex gap-2 pb-2 text-[14px] text-zinc-500 cursor-pointer">
+                  <span>thinking...</span>
+                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 w-[20px]" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pb-3 text-[14px] text-zinc-500">
+                  {message.content.split("</think>")[0]}
+                </CollapsibleContent>
+              </Collapsible>
+              <Markdown>{message.content.split("</think>")[1]}</Markdown>
+            </>
+          ) : (
+            <Markdown>{message.content}</Markdown>
+          )
+        ) : (
+          <Markdown>{message.content}</Markdown>
+        )}
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
 
   return (
     <button
-      className="flex items-center gap-2 p-2 justify-center cursor-pointer outline-none"
+      className="w-full flex items-center gap-2 p-2 justify-center cursor-pointer outline-none"
       onMouseEnter={() => {
         setTimeoutId(
           setTimeout(() => {

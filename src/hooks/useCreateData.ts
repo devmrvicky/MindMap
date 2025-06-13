@@ -46,9 +46,9 @@ const useCreateData = () => {
       const newChatRoom: ChatRoom = {
         chatRoomId: activeChatRoomId,
         chatRoomName: prompt,
-        userId: user ? user._id : "",
+        userId: user?._id || "",
       };
-      // update chat room store
+      // update zustand chat room store
       createNewChatRoomOnLocal(newChatRoom);
       // create new chat room in indexDB
       updateData({
@@ -58,16 +58,19 @@ const useCreateData = () => {
       // create chat room in mongoDB (condition: when user logged in means if user has value)
       if (user) {
         const chatRoom = await axiosConfig.post(
-          "chat/room/create",
+          "/chat/room/create",
           newChatRoom
         );
-        console.log(chatRoom);
+        console.log("create chat room successfully: ", chatRoom);
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message);
-      }
+      toast.error(
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : "Unknown error occur"
+      );
       console.error(error);
+      return "ERROR_OCCUR";
     }
   };
 
@@ -78,14 +81,14 @@ const useCreateData = () => {
     role,
   }: createChatProps) => {
     const newChat: Chat = {
-      id: uuidv1(),
+      chatId: uuidv1(),
       role,
       content: prompt,
       chatRoomId: activeChatRoomId,
       usedModel: currentLLMModel,
     };
 
-    // update zustand store to see ui effect
+    // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
     addNewChat(newChat);
     // create new chat in indexDB
     updateData({
@@ -95,14 +98,20 @@ const useCreateData = () => {
     try {
       // create chat in mongoDB(condition: when user logged in means if user has value)
       if (user) {
-        await axiosConfig.post("/create", newChat);
-        console.log("chat created with role: ", role);
+        const chatRes = await axiosConfig.post(
+          `/chat/create/${activeChatRoomId}`,
+          newChat
+        );
+        console.log("chat created : ", chatRes);
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message);
-      }
+      toast.error(
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : "Unknown error occur"
+      );
       console.error(error);
+      return "ERROR_OCCUR";
     }
   };
 

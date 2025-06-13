@@ -18,6 +18,7 @@ const useAuth = () => {
       // Redirect the user to the Google OAuth2 URL
       window.location.href = res.data.OAuth2Url;
       // navigate(res.data.OAuth2Url);
+      // * after this step please check out /pages/AuthCallback.tsx page
     } catch (error) {
       console.error(error);
       if (error instanceof AxiosError) {
@@ -31,7 +32,7 @@ const useAuth = () => {
   // c
   const logoutAuth = async () => {
     try {
-      await axiosConfig.post("/auth/logout");
+      await axiosConfig.post("/user/logout");
       // logout from client store
       logout();
       toast.success("User logout successfully!", {
@@ -50,6 +51,11 @@ const useAuth = () => {
       }
     }
   };
+
+  // login auth
+  // const loginAuth = async (user: User) => {
+  //   login(user)
+  // }
 
   return {
     redirectGoogleAuthUrl,

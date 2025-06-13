@@ -2,11 +2,11 @@ export {};
 
 declare global {
   interface Chat {
-    id: string;
+    chatId: string;
     role: "user" | "assistant";
     content: string;
     chatRoomId: string;
-    usedModel: string
+    usedModel: string;
   }
 
   interface Model {
@@ -33,7 +33,9 @@ declare global {
     activeChatRoom: ActiveChatRoom;
     setActiveChatRoom: (chatRoom: ActiveChatRoom) => void;
     createNewChatRoomOnLocal: (newChatRoom: ChatRoom) => void;
-    deleteChatRoomFromLocal: (id: string) => void;
+    deleteChatRoomFromLocal: (id: string, isActiveChatRoom: boolean) => void;
+    isChatRoomsFetching: boolean;
+    setIsChatRoomsFetching: (isFetching: boolean) => void;
   }
 
   interface Chats {
@@ -45,7 +47,7 @@ declare global {
   interface ChatRoom {
     chatRoomId: string;
     chatRoomName: string;
-    userId: string
+    userId: string;
   }
 
   type ActiveChatRoom = ChatRoom | null;

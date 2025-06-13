@@ -1,22 +1,83 @@
 import MainAside from "./components/sidebars/MainAside.tsx";
 import { useAuthStore, useChatStore } from "@/zustand/store.ts";
 import { useEffect } from "react";
-// import { getAllData } from "./indexDB/indexDB.ts";
 import { toast, ToastContainer } from "react-toastify";
 import axiosConfig from "./axios/axiosConfig.ts";
-// import { AxiosError } from "axios";
-import { getAllData } from "./indexDB/indexDB.ts";
+import { clearStore, getAllData, setAllData } from "./indexDB/indexDB.ts";
 import { AxiosError } from "axios";
-// import useAuth from "./hooks/useAuth.ts";
-import useDeleteData from "./hooks/useDeleteData.ts";
 
 function App() {
-  const { activeChatRoom, setChatRooms, setChatsHistory, chatRooms } =
-    useChatStore((store) => store);
+  const {
+    activeChatRoom,
+    setChatRooms,
+    setChatsHistory,
+    setIsChatRoomsFetching,
+  } = useChatStore((store) => store);
 
-  const { user, logout } = useAuthStore((store) => store);
-  // const { logoutAuth } = useAuth();
-  const { deleteChatRoom } = useDeleteData();
+  const { user, login, logout } = useAuthStore((store) => store);
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const response = await axiosConfig.get("/user");
+        if (response && response.data.user) {
+          // login
+          login(response.data.user);
+        } else {
+          // logout
+          logout();
+        }
+      } catch (error) {
+        logout();
+        console.log(error);
+        // toast.error(
+        //   error instanceof AxiosError
+        //     ? error.response?.data.message
+        //     : "Unknown error"
+        // );
+      }
+    })();
+  }, [login, logout]);
+
+  // get chat room and chats if user logged in
+  useEffect(() => {
+    (async function () {
+      try {
+        setIsChatRoomsFetching(true);
+        let chatRooms: ChatRoom[];
+        let chats: Chat[] = [];
+        if (!user) {
+          // if user not logged in fetch data from indexDB
+          const data = await Promise.all([
+            getAllData({ storeName: "chatRoom" }),
+            getAllData({ storeName: "chat" }),
+          ]);
+          chatRooms = data[0] as ChatRoom[];
+          chats = data[1] as Chat[];
+          console.log(chatRooms);
+          // return;
+        } else {
+          // delete all indexDB data (chats and chat rooms) before fatching data from database
+          clearStore("chatRoom");
+          clearStore("chat");
+          const res = await axiosConfig.get("/chat/room");
+          console.log("all chat rooms fetch successfully");
+          chatRooms = res.data.chatRooms;
+          setAllData({ data: chatRooms, storeName: "chatRoom" });
+        }
+        setChatRooms(chatRooms);
+        setChatsHistory(chats as Chat[]);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data.message, {
+            toastId: "logout failed",
+          });
+        }
+      } finally {
+        setIsChatRoomsFetching(false);
+      }
+    })();
+  }, [setChatRooms, user, setChatsHistory, setIsChatRoomsFetching]);
 
   // this useEffect will keeep chaging title
   useEffect(() => {
@@ -26,59 +87,6 @@ function App() {
       document.title = "Mind Map";
     }
   }, [activeChatRoom]);
-
-  useEffect(() => {
-    // get all chat rooms from indexDB
-    getAllData({
-      storeName: "chatRoom",
-    })
-      .then((data) => {
-        // set chat rooms to the store
-        setChatRooms(data as ChatRoom[]);
-      })
-      .catch((error) => {
-        console.error("Error getting data from indexDB", error);
-      });
-    // get all chats from indexDB
-    getAllData({
-      storeName: "chat",
-    })
-      .then((data) => {
-        // set chat rooms to the store
-        // console.log(data)
-        setChatsHistory(data as Chat[]);
-      })
-      .catch((error) => {
-        console.error("Error getting data from indexDB", error);
-      });
-  }, [setChatRooms, setChatsHistory]);
-
-  useEffect(() => {
-    (async function () {
-      try {
-        if (!user) return;
-        const res = await axiosConfig.get("/chat/room");
-        console.log("all chat rooms fetch successfully");
-        setChatRooms(res.data.chatRooms);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          toast.error(error.response?.data.message, {
-            toastId: "logout failed",
-          });
-          if (error.response?.data.message === "Access token is required") {
-            logout();
-            toast.success("User logout successfully!", {
-              toastId: "logout successfully",
-            });
-            // delete all data from indexDB
-            await deleteChatRoom({
-              chatRoomIds: chatRooms.map((chatRoom) => chatRoom.chatRoomId),
-            });
-          }
-        }
-      }
-    })();
-  }, [user, setChatRooms, chatRooms, deleteChatRoom, logout]);
 
   return (
     <div>

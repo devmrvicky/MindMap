@@ -22,7 +22,7 @@ import useDeleteData from "@/hooks/useDeleteData";
 
 export function NavChatRooms() {
   const { isMobile } = useSidebar();
-  const { chatRooms } = useChatStore((store) => store);
+  const { chatRooms, isChatRoomsFetching } = useChatStore((store) => store);
 
   const { deleteChatRoom } = useDeleteData();
 
@@ -45,46 +45,50 @@ export function NavChatRooms() {
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
       <SidebarMenu>
-        {chatRooms.length
-          ? chatRooms.map((chatRoom) => (
-              <SidebarMenuItem
-                key={chatRoom.chatRoomId}
-                onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
-                className={`cursor-pointer ${
-                  chatRoomId === chatRoom.chatRoomId ? "bg-sidebar-accent" : ""
-                }`}
-              >
-                <SidebarMenuButton asChild>
-                  <span className="truncate" title={chatRoom.chatRoomName}>
-                    {chatRoom.chatRoomName}
-                  </span>
-                </SidebarMenuButton>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuAction showOnHover>
-                      <MoreHorizontal />
-                      <span className="sr-only">More</span>
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-auto rounded-lg"
-                    side={isMobile ? "bottom" : "right"}
-                    align={isMobile ? "end" : "start"}
-                  >
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={(e) =>
-                        handleDeleteChatRoom(e, chatRoom.chatRoomId)
-                      }
+        {!isChatRoomsFetching
+          ? chatRooms.length
+            ? chatRooms.map((chatRoom) => (
+                <SidebarMenuItem
+                  key={chatRoom.chatRoomId}
+                  onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
+                  className={`cursor-pointer ${
+                    chatRoomId === chatRoom.chatRoomId
+                      ? "bg-sidebar-accent"
+                      : ""
+                  }`}
+                >
+                  <SidebarMenuButton asChild className="w-[85%]">
+                    <span className="truncate" title={chatRoom.chatRoomName}>
+                      {chatRoom.chatRoomName}
+                    </span>
+                  </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction showOnHover className="cursor-pointer">
+                        <MoreHorizontal />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-auto rounded-lg"
+                      side={isMobile ? "bottom" : "right"}
+                      align={isMobile ? "end" : "start"}
                     >
-                      <Trash2 className="text-muted-foreground" />
-                      <span>Delete</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            ))
-          : "No chat found"}
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={(e) =>
+                          handleDeleteChatRoom(e, chatRoom.chatRoomId)
+                        }
+                      >
+                        <Trash2 className="text-muted-foreground" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              ))
+            : "No chat found"
+          : "loading..."}
         {/* <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal className="text-sidebar-foreground/70" />

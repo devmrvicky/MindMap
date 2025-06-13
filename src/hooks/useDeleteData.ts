@@ -10,31 +10,46 @@
  * This ensures seamless data management and synchronization across the application.
  */
 
+// import axiosConfig from "@/axios/axiosConfig";
 import { deleteData } from "@/indexDB/indexDB";
 import { useChatStore } from "@/zustand/store";
+import { useNavigate, useParams } from "react-router";
 
 const useDeleteData = () => {
-  const { deleteChatRoomFromLocal, chatsHistory } = useChatStore(
-    (store) => store
-  );
+  const { deleteChatRoomFromLocal, chatsHistory, setCurrentChatsHistory } =
+    useChatStore((store) => store);
+
+  const param = useParams();
+
+  const navigate = useNavigate();
 
   const deleteChatRoom = async ({ chatRoomIds }: { chatRoomIds: string[] }) => {
     // delete data from indexDB
-    chatRoomIds.forEach((chatRoomId) => {
+    chatRoomIds.forEach(async (chatRoomId) => {
+      // delete chat room from indexDB
       deleteData({ id: chatRoomId, storeName: "chatRoom" });
+      // delete chat room from mongoDB
+      // await axiosConfig.delete("/")
+      console.log("chat history from delete chat room hook ", chatsHistory);
       chatsHistory
         .filter((chat) => chat.chatRoomId === chatRoomId)
         .forEach((filteredChat) => {
-          deleteData({ id: filteredChat.id, storeName: "chat" });
+          deleteData({ id: filteredChat.chatId, storeName: "chat" });
         });
       // delete chat room from zustand store
-      deleteChatRoomFromLocal(chatRoomId);
+      deleteChatRoomFromLocal(chatRoomId, param.chatRoomId === chatRoomId);
+      if (param.chatRoomId === chatRoomId) {
+        console.log("it matched.");
+        navigate("/");
+        setCurrentChatsHistory([]);
+      }
     });
     // delete all chats which belong to this chat room
     // chatsHistory.forEach((chathistory) => {
 
     //   deleteData({ id: chathistory.id, storeName: "chat" });
     // });
+    // navigate("/");
   };
 
   return { deleteChatRoom };

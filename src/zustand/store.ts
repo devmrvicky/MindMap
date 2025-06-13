@@ -10,6 +10,7 @@ const useChatStore = create<StoreState>((set) => ({
     })),
   addNewChat: (newChat: Chat) =>
     set((state) => ({
+      currentChatsHistory: [...state.currentChatsHistory, newChat],
       chatsHistory: [...state.chatsHistory, newChat],
     })),
   setCurrentChatsHistory: (chats: Chat[]) =>
@@ -17,18 +18,10 @@ const useChatStore = create<StoreState>((set) => ({
       currentChatsHistory: chats,
     })),
 
-  chatRooms: [
-    // {
-    //   id: "chatRoomNo1",
-    //   chatRoomName: "my first chat",
-    // },
-    // {
-    //   id: "chatRoomNo2",
-    //   chatRoomName: "what is your name?",
-    // },
-  ],
+  chatRooms: [],
   activeChatRoom: null,
   isChatRoomActive: false,
+  isChatRoomsFetching: false,
   setChatRooms: (chatRooms: ChatRoom[]) =>
     set(() => ({ chatRooms: chatRooms })),
   setActiveChatRoom: (chatRoom: ActiveChatRoom) =>
@@ -45,16 +38,18 @@ const useChatStore = create<StoreState>((set) => ({
         chatRooms: [...state.chatRooms, newChatRoom],
       };
     }),
-  deleteChatRoomFromLocal: (id: string) =>
+  deleteChatRoomFromLocal: (id: string, isActiveChatRoom: boolean) =>
     set((state) => ({
       chatRooms: state.chatRooms.filter(
         (chatRoom) => chatRoom.chatRoomId !== id
       ),
       chatsHistory: state.chatsHistory.filter((chat) => chat.chatRoomId !== id),
-      currentChatsHistory: state.activeChatRoom
-        ? []
-        : state.currentChatsHistory,
-      activeChatRoom: state.activeChatRoom ? null : state.activeChatRoom,
+      currentChatsHistory: isActiveChatRoom ? [] : state.currentChatsHistory,
+      activeChatRoom: isActiveChatRoom ? null : state.activeChatRoom,
+    })),
+  setIsChatRoomsFetching: (isFetching: boolean) =>
+    set(() => ({
+      isChatRoomsFetching: isFetching,
     })),
 
   isResponseLoading: false,
@@ -109,6 +104,11 @@ const useChatStore = create<StoreState>((set) => ({
       model: "deepseek/deepseek-r1:free",
       label: "free",
     },
+    {
+      name: "Sarvamai",
+      model: "sarvamai/sarvam-m:free",
+      label: "free",
+    },
   ],
   currentLLMModel: "mistralai/mistral-small-3.1-24b-instruct:free",
   changeCurrentLLMModel: (model: string) =>
@@ -116,32 +116,6 @@ const useChatStore = create<StoreState>((set) => ({
       currentLLMModel: model,
     })),
 }));
-
-// const useAuthStore = create((set) => ({
-//   user: null,
-//   isLoggedIn: false,
-//   login: (user: User | null) =>
-//     set(() => {
-//       return {
-//         user: user,
-//         isLoggedIn: true,
-//       };
-//     }),
-//   logout: () =>
-//     set(() => {
-//       return {
-//         user: null,
-//         isLoggedIn: false,
-//       };
-//     }),
-//   canUseWithoutAuth: true,
-//   setCanUseWithoutAuth: (canUse: boolean) =>
-//     set(() => {
-//       return {
-//         canUseWithoutAuth: canUse,
-//       };
-//     }),
-// }));
 
 const useAuthStore = create<AuthStoreState>()(
   persist<AuthStoreState>(

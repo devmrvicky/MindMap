@@ -53,6 +53,13 @@ const ChatInput = () => {
           } else if (e.key === "Enter" && e.shiftKey) {
             e.preventDefault();
             setPrompt((prev) => prev + "\n");
+            console.log(e);
+            const textarea = e.currentTarget as HTMLTextAreaElement;
+            setTimeout(() => {
+              if (textarea) {
+                textarea.scrollTop = textarea.scrollHeight;
+              }
+            }, 0);
           }
         }}
       />

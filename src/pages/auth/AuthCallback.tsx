@@ -1,12 +1,13 @@
 // import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 // import { api } from "../../api/api";
-import { useAuthStore } from "@/zustand/store";
+import { useAuthStore, useChatStore } from "@/zustand/store";
 import { useEffect } from "react";
 import axiosConfig from "@/axios/axiosConfig";
 import { toast } from "react-toastify";
 import Logo from "@/components/utils/Logo";
 import { AxiosError } from "axios";
+import useDeleteData from "@/hooks/useDeleteData";
 // import { toast } from "react-toastify";
 // import Loader from "../../components/utils/Loader";
 
@@ -18,6 +19,10 @@ const AuthCallback = () => {
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
+  const { chatRooms } = useChatStore((store) => store);
+
+  const { deleteChatRoom } = useDeleteData();
+
   useEffect(() => {
     (async () => {
       if (!authorizationCode) {
@@ -25,9 +30,13 @@ const AuthCallback = () => {
         return;
       }
       try {
-        const res = await axiosConfig.post("/auth/google/callback", {
-          code: authorizationCode,
-        }, {withCredentials: true});
+        const res = await axiosConfig.post(
+          "/auth/google/callback",
+          {
+            code: authorizationCode,
+          },
+          { withCredentials: true }
+        );
         console.log(res);
         const { message, user } = res.data;
         if (!user) {
@@ -39,6 +48,10 @@ const AuthCallback = () => {
         login(user);
         toast.success(message);
         navigate("/");
+        // for now we delete all local data that user create before login but further we create a router that will handle save data that user create before login in mongoDB database
+        await deleteChatRoom({
+          chatRoomIds: chatRooms.map((room) => room.chatRoomId),
+        });
       } catch (error) {
         console.error(error);
         if (error instanceof AxiosError) {
