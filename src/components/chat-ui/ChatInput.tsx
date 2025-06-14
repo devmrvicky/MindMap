@@ -10,9 +10,19 @@ import { Label } from "@/components/ui/label";
 import LoginDialog from "../LoginDialog";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { Mic, MicOff } from "lucide-react";
+import useWebSpeech from "@/hooks/useWebSpeech";
 
 const ChatInput = () => {
-  const [prompt, setPrompt] = useState<string>("");
+  // get all var to use mice button
+  const {
+    handleStartListening,
+    isListening,
+    speech,
+    recognitionRef,
+    handleStopListening,
+  } = useWebSpeech();
+  const [prompt, setPrompt] = useState<string>(speech);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { getLLMResponse } = useLLMRequest();
@@ -45,6 +55,7 @@ const ChatInput = () => {
         autoFocus
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
+        ref={recognitionRef}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey && prompt.trim() && !isMobile) {
             handleSendChatRequest(prompt);
@@ -101,6 +112,68 @@ const ChatInput = () => {
             className="bg-white border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
           >
             <ImagePlus />
+          </Button>
+          {/* mice button */}
+          <Button
+            variant="outline"
+            className={`${
+              isListening ? "bg-zinc-300" : "bg-white"
+            } border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"`}
+            onClick={() =>
+              isListening
+                ? handleStopListening()
+                : handleStartListening({ setPrompt })
+            }
+            title={isListening ? "Stop Listening" : "Start Listening"}
+            // setPrompt={setPrompt}
+          >
+            {isListening ? (
+              // Music wave icon (SVG)
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect
+                  x="3"
+                  y="10"
+                  width="2"
+                  height="4"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <rect
+                  x="7"
+                  y="7"
+                  width="2"
+                  height="10"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <rect
+                  x="11"
+                  y="4"
+                  width="2"
+                  height="16"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <rect
+                  x="15"
+                  y="7"
+                  width="2"
+                  height="10"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <rect
+                  x="19"
+                  y="10"
+                  width="2"
+                  height="4"
+                  rx="1"
+                  fill="currentColor"
+                />
+              </svg>
+            ) : (
+              <Mic />
+            )}
           </Button>
         </div>
         <Button
