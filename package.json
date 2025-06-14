@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^6.1.0",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-collapsible": "^1.1.8",
     "@radix-ui/react-context-menu": "^2.2.12",
@@ -24,6 +25,7 @@
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "google-tts-api": "^2.0.2",
     "lucide-react": "^0.503.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -32,6 +34,7 @@
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.4",
+    "tts": "^0.1.0",
     "uuid": "^11.1.0",
     "zustand": "^5.0.3"
   },
