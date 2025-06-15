@@ -66,7 +66,7 @@ const useChatStore = create<StoreState>((set) => ({
     })),
 
   // current llm model
-  models: [
+  chatModels: [
     {
       name: "Mistral 7B",
       model: "mistralai/mistral-small-3.1-24b-instruct:free",
@@ -107,6 +107,25 @@ const useChatStore = create<StoreState>((set) => ({
     {
       name: "Sarvamai",
       model: "sarvamai/sarvam-m:free",
+      label: "free",
+    },
+  ],
+  // image models
+  imageModels: [
+    {
+      name: "Black forest labs flux schnell",
+      model: "black-forest-labs/flux-schnell",
+      label: "free",
+    },
+    {
+      name: "Black forest labs flux dev",
+      model: "black-forest-labs/flux-dev",
+      label: "free",
+    },
+
+    {
+      name: "Stability ai sdxl",
+      model: "stability-ai/sdxl",
       label: "free",
     },
   ],

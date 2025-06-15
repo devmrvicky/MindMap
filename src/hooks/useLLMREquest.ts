@@ -6,7 +6,6 @@ import { useParams, useNavigate } from "react-router";
 import useCreateData from "./useCreateData";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import useGenerateImage from "./useGenerateImage";
 
 const useLLMRequest = () => {
   const {
@@ -18,8 +17,6 @@ const useLLMRequest = () => {
   } = useChatStore((state) => state);
 
   const { imageGenerationOn } = useImageStore((state) => state);
-
-  const { generateImage } = useGenerateImage();
 
   const { createChatRoom, createChat } = useCreateData();
 

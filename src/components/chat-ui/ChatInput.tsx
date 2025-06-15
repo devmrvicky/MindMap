@@ -1,5 +1,4 @@
-import { useChatStore, useImageStore } from "@/zustand/store";
-// import { Input } from "@/components/ui/input";
+import { useChatStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { useState } from "react";
@@ -11,7 +10,6 @@ import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import useWebSpeech from "@/hooks/useWebSpeech";
 import ChatInputToolsBtn from "../ChatInputToolsBtn";
-import useGenerateImage from "@/hooks/useGenerateImage";
 
 const ChatInput = () => {
   // get all var to use mice button
@@ -21,19 +19,11 @@ const ChatInput = () => {
 
   const { getLLMResponse } = useLLMRequest();
   const { currentChatsHistory } = useChatStore((state) => state);
-  const { imageGenerationOn } = useImageStore((state) => state);
-
-  const { generateImage } = useGenerateImage();
 
   const isMobile = useIsMobile();
 
   const handleSendChatRequest = async (prompt: string) => {
     try {
-      // if (imageGenerationOn) {
-      //   const res = await generateImage({ prompt });
-      //   console.log(res.data.data.data[0].url);
-      //   return;
-      // }
       await getLLMResponse(prompt, () => setDialogOpen(true));
     } catch (error) {
       if (error instanceof AxiosError) {

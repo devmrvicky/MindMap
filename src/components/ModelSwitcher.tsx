@@ -15,13 +15,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useChatStore } from "@/zustand/store";
+import { useChatStore, useImageStore } from "@/zustand/store";
 
 export function ModelSwitcher() {
+  const { chatModels, changeCurrentLLMModel, imageModels } = useChatStore(
+    (state) => state
+  );
+  const [models, setModels] = React.useState(chatModels);
   const { isMobile } = useSidebar();
 
-  const { models, changeCurrentLLMModel } = useChatStore((state) => state);
   const [activeModel, setActiveModel] = React.useState(models[0]);
+
+  const { imageGenerationOn } = useImageStore((store) => store);
   // console.log(activeModel);
 
   React.useEffect(() => {
@@ -29,6 +34,10 @@ export function ModelSwitcher() {
       changeCurrentLLMModel(activeModel.model);
     }
   }, [activeModel, changeCurrentLLMModel]);
+
+  React.useEffect(() => {
+    setModels(imageGenerationOn ? imageModels : chatModels);
+  }, [imageGenerationOn]);
 
   return (
     <SidebarMenu>

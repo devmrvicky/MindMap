@@ -24,7 +24,8 @@ declare global {
     isResponseLoading: boolean;
     setIsResponseLoading: (isLoading: boolean) => void;
     LLMResponsedError: string;
-    models: Model[];
+    chatModels: Model[];
+    imageModels: Model[];
     setLLMResponsedError: (error: string) => void;
     currentLLMModel: string;
     changeCurrentLLMModel: (model: string) => void;
