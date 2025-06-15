@@ -37,7 +37,7 @@ const ChatUI = () => {
           const chatsFromMongoDB = res.data.chats;
           console.log("chatsFromMongoDB ", chatsFromMongoDB);
           setCurrentChatsHistory(chatsFromMongoDB);
-          // set chats to index database
+          // set chats to index databasep
         }
       } catch (error) {
         console.error(error);

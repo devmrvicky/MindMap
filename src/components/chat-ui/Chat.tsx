@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import ChatActionsBtns from "../ChatActionsBtns";
+import Img from "../utils/Img";
 
 const Chat = ({
   message,
@@ -20,6 +21,7 @@ const Chat = ({
 }) => {
   const [thinking, setThinking] = useState<string | null>(null);
   const [actualResponse, setActualResponse] = useState<string>("");
+  const [chatType, setChatType] = useState<"text" | "image">("text");
 
   useEffect(() => {
     if (message.role === "assistant" && message.content.includes("</think>")) {
@@ -28,7 +30,17 @@ const Chat = ({
     } else {
       setActualResponse(message.content);
     }
-  });
+  }, [message.content, message.role]);
+
+  useEffect(() => {
+    const imageUrlRegex =
+      /^https:\/\/pictures-storage\.storage\.eu-north1\.nebius\.cloud\/.*\.webp$/;
+    if (imageUrlRegex.test(message.content)) {
+      setChatType("image");
+    } else {
+      setChatType("text");
+    }
+  }, [message.content]);
   return (
     <div
       key={message.chatId}
@@ -57,15 +69,21 @@ const Chat = ({
             </CollapsibleContent>
           </Collapsible>
         )}
-        <Markdown>{actualResponse}</Markdown>
+        {chatType === "text" ? (
+          <Markdown>{actualResponse}</Markdown>
+        ) : (
+          <Img imgSrc={message.content} className="w-full h-auto rounded-lg" />
+        )}
       </div>
 
-      <ChatActionsBtns
-        message={actualResponse}
-        className={`${
-          index + 1 === totalChats && !isLLmResponseLoading && "mb-30"
-        }`}
-      />
+      {chatType === "text" && (
+        <ChatActionsBtns
+          message={actualResponse}
+          className={`${
+            index + 1 === totalChats && !isLLmResponseLoading && "mb-30"
+          }`}
+        />
+      )}
     </div>
   );
 };

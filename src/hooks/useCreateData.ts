@@ -12,7 +12,7 @@ interface createChatRoomProps {
 }
 interface createChatProps {
   activeChatRoomId: ChatRoom["chatRoomId"];
-  prompt: string;
+  content: string;
   role: "user" | "assistant";
 }
 
@@ -77,13 +77,13 @@ const useCreateData = () => {
   // create chats
   const createChat = async ({
     activeChatRoomId,
-    prompt,
+    content,
     role,
   }: createChatProps) => {
     const newChat: Chat = {
       chatId: uuidv1(),
       role,
-      content: prompt,
+      content,
       chatRoomId: activeChatRoomId,
       usedModel: currentLLMModel,
     };

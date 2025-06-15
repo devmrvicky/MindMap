@@ -83,4 +83,17 @@ declare global {
     profilePic: string;
     password: string;
   }
+
+  interface ImageStoreState {
+    imageGenerationOn: boolean;
+    generatedImages: string[];
+    setGeneratedImages: (images: string[]) => void;
+    addGeneratedImage: (image: string) => void;
+    clearGeneratedImages: () => void;
+    setImageGenerationOn: (on: boolean) => void;
+    isImageGenerating: boolean;
+    setIsImageGenerating: (isGenerating: boolean) => void;
+    imageGenerationError: string;
+    setImageGenerationError: (error: string) => void;
+  }
 }

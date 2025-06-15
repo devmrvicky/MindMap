@@ -1,24 +1,25 @@
 import axiosConfig from "@/axios/axiosConfig";
-import { useChatStore } from "@/zustand/store";
+import { useChatStore, useImageStore } from "@/zustand/store";
 // import { useEffect } from "react";
 import { v1 as uuidv1 } from "uuid";
 import { useParams, useNavigate } from "react-router";
 import useCreateData from "./useCreateData";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import useGenerateImage from "./useGenerateImage";
 
 const useLLMRequest = () => {
   const {
-    // chatsHistory,
     currentChatsHistory,
-    // setCurrentChatsHistory,
     setIsResponseLoading,
     setLLMResponsedError,
     currentLLMModel,
     activeChatRoom,
-    // setActiveChatRoom,
-    // chatRooms,
   } = useChatStore((state) => state);
+
+  const { imageGenerationOn } = useImageStore((state) => state);
+
+  const { generateImage } = useGenerateImage();
 
   const { createChatRoom, createChat } = useCreateData();
 
@@ -65,37 +66,56 @@ Logic:
         navigate(`/c/${activeChatRoomId}`); // navigate to the new chat room
       }
 
-      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store
-      const err = await createChat({ activeChatRoomId, prompt, role: "user" });
+      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (but only for role: user)
+      const err = await createChat({
+        activeChatRoomId,
+        content: prompt,
+        role: "user",
+      });
       if (err === "ERROR_OCCUR") return;
       // set the response loading state to true
       setIsResponseLoading(true);
       // make the post request to the server to get the response from the LLM
-      const response = await axiosConfig.post("/chat/generate", {
-        query: prompt,
-        model: currentLLMModel,
-        prevResponse: JSON.stringify(
-          currentChatsHistory
-            .map((chat) => ({
-              role: chat.role,
-              content: chat.content,
-            }))
-            .slice(-5) // send the last 5 messages to the server
-        ), // send the previous response to the server
-      });
+      let aiResponse;
+      if (imageGenerationOn) {
+        // if image generation is on then send the request to the image generation endpoint
+        aiResponse = await axiosConfig.post("/chat/image/generate", {
+          prompt,
+        });
+      } else {
+        aiResponse = await axiosConfig.post("/chat/generate", {
+          query: prompt,
+          model: currentLLMModel,
+          prevResponse: JSON.stringify(
+            currentChatsHistory
+              .map((chat) => ({
+                role: chat.role,
+                content: chat.content,
+              }))
+              .slice(-5) // send the last 5 messages to the server
+          ), // send the previous response to the server
+        });
+      }
       // handle axios error
-      if (response.status !== 200) {
+      if (aiResponse?.status !== 200) {
         console.error("Error in response from server");
         setIsResponseLoading(false);
         setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
-        return response.data;
+        return aiResponse.data;
       }
-      const content = response.data.response.choices[0].message.content;
+      // console.log("AI response: ", aiResponse.data);
+      let content: string;
+      if (imageGenerationOn) {
+        // if image generation is on then get the image url from the response
+        content = aiResponse.data.data.data[0].url;
+      } else {
+        content = aiResponse.data.response.choices[0].message.content;
+      }
 
-      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store
+      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (for role: assistant)
       const error = await createChat({
         activeChatRoomId,
-        prompt: content,
+        content,
         role: "assistant",
       });
       if (error === "ERROR_OCCUR") {

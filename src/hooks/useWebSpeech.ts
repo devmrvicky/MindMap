@@ -11,9 +11,9 @@ declare global {
 
 const useWebSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(
-    null
-  );
+  // const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(
+  //   null
+  // );
 
   const handleStartSpeak = ({
     text,
@@ -32,7 +32,7 @@ const useWebSpeech = () => {
           .find((v) => v.name === "Microsoft Heera - English (India)") || null;
     u.onend = () => setIsSpeaking(false);
     u.onerror = () => setIsSpeaking(false);
-    setUtterance(u);
+    // setUtterance(u);
     setIsSpeaking(true);
     window.speechSynthesis.speak(u);
   };
@@ -40,12 +40,11 @@ const useWebSpeech = () => {
   const handleStopSpeak = () => {
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
-    setUtterance(null);
+    // setUtterance(null);
   };
 
   // speech recognition
   const [isListening, setIsListening] = useState(false);
-  const [speech, setSpeech] = useState("");
   // Add type declaration for SpeechRecognition if not present
   type SpeechRecognitionType = typeof window.SpeechRecognition extends undefined
     ? typeof window.webkitSpeechRecognition
@@ -102,7 +101,6 @@ const useWebSpeech = () => {
     handleStartListening,
     handleStopListening,
     isListening,
-    speech,
     recognitionRef,
   };
 };
