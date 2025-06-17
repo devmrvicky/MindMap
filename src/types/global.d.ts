@@ -97,4 +97,10 @@ declare global {
     imageGenerationError: string;
     setImageGenerationError: (error: string) => void;
   }
+
+
+  interface ThemeStoreState {
+    isDarkMode: boolean;
+    setDarkMode: (isDark: boolean) => void;
+  }
 }

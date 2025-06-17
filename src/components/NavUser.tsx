@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import LogoutBtn from "./buttons/auth/LogoutBtn";
+import ThemeSwitcherBtns from "./buttons/ThemeSwitcherBtns";
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
@@ -58,6 +59,10 @@ export function NavUser({ user }: { user: User }) {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <ThemeSwitcherBtns />
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogoutBtn />

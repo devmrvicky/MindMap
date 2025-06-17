@@ -1,8 +1,9 @@
 import logoPng from "@/assets/mind-map.png";
+import lightLogoPng from "@/assets/light-mind-map.png";
 import logoGif from "@/assets/mind-map.gif";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useChatStore } from "@/zustand/store";
+import { useChatStore, useThemeStore } from "@/zustand/store";
 
 const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -14,17 +15,27 @@ const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
     (store) => store
   );
 
+  const { isDarkMode } = useThemeStore((store) => store);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      setCurrentLogoIcon(lightLogoPng);
+    }
+  }, [isDarkMode]);
+
   return (
     <button
       className="w-full flex items-center gap-2 p-2 justify-center cursor-pointer outline-none"
       onMouseEnter={() => {
+        if (timeoutId) clearTimeout(timeoutId);
         setTimeoutId(
           setTimeout(() => {
-            setCurrentLogoIcon(isIconSpin ? logoPng : logoGif);
+            setCurrentLogoIcon(isIconSpin && !isDarkMode ? logoPng : logoGif);
           }, 1000)
         );
       }}
       onMouseLeave={() => {
+        if (isDarkMode) return;
         setCurrentLogoIcon(isIconSpin ? logoGif : logoPng);
         if (timeoutId) clearTimeout(timeoutId);
       }}

@@ -7,11 +7,8 @@ const MicBtn = ({
 }: {
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const {
-    handleStartListening,
-    isListening,
-    handleStopListening,
-  } = useWebSpeech();
+  const { handleStartListening, isListening, handleStopListening } =
+    useWebSpeech();
 
   return (
     <Button

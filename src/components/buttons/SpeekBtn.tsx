@@ -8,7 +8,7 @@ const SpeekBtn = ({ text }: { text: string }) => {
   const { handleStartSpeak, handleStopSpeak, isSpeaking } = useWebSpeech();
   const [selectedVoice, setSelectedVoice] =
     useState<SpeechSynthesisVoice | null>(null);
-  console.log(selectedVoice);
+
   return (
     <div className="flex gap-2">
       {!isSpeaking ? (
@@ -92,8 +92,8 @@ const SeleteVoices = ({
                 key={voice.voiceURI}
                 className={`flex items-center justify-between p-2 rounded cursor-pointer ${
                   selectedVoice?.voiceURI === voice.voiceURI
-                    ? "bg-green-100 font-bold"
-                    : "hover:bg-gray-100"
+                    ? "bg-green-100 text-white dark:text-black font-bold"
+                    : "hover:bg-gray-500  hover:text-white hover:dark:text-black"
                 }`}
                 onClick={() => {
                   setSelectedVoice(voice);

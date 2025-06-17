@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { LoaderCircle, MoreHorizontal, Trash2 } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -19,12 +19,14 @@ import {
 import { useChatStore } from "@/zustand/store";
 import { useNavigate, useParams } from "react-router";
 import useDeleteData from "@/hooks/useDeleteData";
+import { useState } from "react";
 
 export function NavChatRooms() {
+  const [targetChatRoomId, setTargetChatRoomId] = useState<string | null>(null);
   const { isMobile } = useSidebar();
   const { chatRooms, isChatRoomsFetching } = useChatStore((store) => store);
 
-  const { deleteChatRoom } = useDeleteData();
+  const { deleteChatRoom, deleting } = useDeleteData();
 
   const navigate = useNavigate();
   const { chatRoomId } = useParams();
@@ -38,6 +40,7 @@ export function NavChatRooms() {
     id: string
   ): Promise<void> => {
     e.stopPropagation();
+    setTargetChatRoomId(id);
     await deleteChatRoom({ chatRoomIds: [id] });
   };
 
@@ -51,7 +54,7 @@ export function NavChatRooms() {
                 <SidebarMenuItem
                   key={chatRoom.chatRoomId}
                   onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
-                  className={`cursor-pointer ${
+                  className={`cursor-pointer flex items-center gap-2 ${
                     chatRoomId === chatRoom.chatRoomId
                       ? "bg-sidebar-accent"
                       : ""
@@ -62,29 +65,36 @@ export function NavChatRooms() {
                       {chatRoom.chatRoomName}
                     </span>
                   </SidebarMenuButton>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuAction showOnHover className="cursor-pointer">
-                        <MoreHorizontal />
-                        <span className="sr-only">More</span>
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-auto rounded-lg"
-                      side={isMobile ? "bottom" : "right"}
-                      align={isMobile ? "end" : "start"}
-                    >
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={(e) =>
-                          handleDeleteChatRoom(e, chatRoom.chatRoomId)
-                        }
+                  {deleting && targetChatRoomId === chatRoom.chatRoomId ? (
+                    <LoaderCircle className=" w-4 h-4 animate-spin" />
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction
+                          showOnHover
+                          className="cursor-pointer"
+                        >
+                          <MoreHorizontal />
+                          <span className="sr-only">More</span>
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-auto rounded-lg"
+                        side={isMobile ? "bottom" : "right"}
+                        align={isMobile ? "end" : "start"}
                       >
-                        <Trash2 className="text-muted-foreground" />
-                        <span>Delete</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={(e) =>
+                            handleDeleteChatRoom(e, chatRoom.chatRoomId)
+                          }
+                        >
+                          <Trash2 className="text-muted-foreground" />
+                          <span>Delete</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </SidebarMenuItem>
               ))
             : "No chat found"

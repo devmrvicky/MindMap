@@ -13,7 +13,7 @@ const ChatInputToolsBtn = ({
     <div className="flex items-center justify-center gap-1">
       <Label
         htmlFor="file-upload"
-        className="bg-white border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
+        className=" border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
       >
         <Paperclip className="w-4" />
       </Label>

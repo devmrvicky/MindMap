@@ -21,14 +21,14 @@ const LogoutBtn = () => {
   return (
     <Button
       variant="destructive"
-      className="w-full bg-white text-red-500 hover:bg-red-500/10 cursor-pointer"
+      className="w-full bg-white text-red-500 hover:bg-red-500/10 cursor-pointer dark:text-white"
       onClick={handleLogoutUser}
       disabled={waiting}
     >
       {waiting ? (
         <LoaderCircle className="animate-spin" />
       ) : (
-        <LogOut className="text-red-500 hover:bg-red-500/10 " />
+        <LogOut className="text-red-500 hover:bg-red-500/10 dark:text-white" />
       )}
       Log out
     </Button>

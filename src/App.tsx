@@ -1,5 +1,5 @@
 import MainAside from "./components/sidebars/MainAside.tsx";
-import { useAuthStore, useChatStore } from "@/zustand/store.ts";
+import { useAuthStore, useChatStore, useThemeStore } from "@/zustand/store.ts";
 import { useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import axiosConfig from "./axios/axiosConfig.ts";
@@ -15,6 +15,8 @@ function App() {
   } = useChatStore((store) => store);
 
   const { user, login, logout } = useAuthStore((store) => store);
+
+  const {isDarkMode, setDarkMode} = useThemeStore((store) => store);
 
   useEffect(() => {
     (async function () {
@@ -87,6 +89,18 @@ function App() {
       document.title = "Mind Map";
     }
   }, [activeChatRoom]);
+
+  useEffect(() => {
+    // check system theme
+    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    console.log("isDarkMode: ", isDarkMode);
+    setDarkMode(isDarkMode);
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [])
 
   return (
     <div>

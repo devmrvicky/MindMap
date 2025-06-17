@@ -47,7 +47,7 @@ const ChatUI = () => {
 
   return (
     <div
-      className="bg-white w-full h-full chat-container"
+      className="bg-white dark:bg-black w-full h-full chat-container"
       // ref={chatContainerRef}
     >
       <div

@@ -35,7 +35,7 @@ const ChatInput = () => {
 
   return (
     <div
-      className={`bg-white shadow-2xl border max-w-[700px] w-full rounded-2xl my-3 flex flex-col items-center justify-center p-2 ${
+      className={`bg-white dark:bg-zinc-800 shadow-2xl border max-w-[700px] w-full rounded-2xl my-3 flex flex-col items-center justify-center p-2 ${
         currentChatsHistory.length > 0
           ? `sticky max-w-[500px] w-full bottom-2 bg-blend-hard-light z-50`
           : ""
@@ -43,7 +43,7 @@ const ChatInput = () => {
     >
       <Textarea
         placeholder="Ask me anything..."
-        className={`rounded-2xl h-[50px] w-full  bg-white placeholder:text-lg text-black border-none focus:outline-none focus:ring-0 focus:border-none shadow-none resize-none`}
+        className={`rounded-2xl h-[50px] w-full  bg-white placeholder:text-lg dark:text-white text-black border-none focus:outline-none focus:ring-0 focus:border-none shadow-none resize-none`}
         autoFocus
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}

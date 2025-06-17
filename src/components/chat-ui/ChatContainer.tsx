@@ -1,15 +1,16 @@
-import { useChatStore } from "@/zustand/store";
+import { useChatStore, useImageStore } from "@/zustand/store";
 import Chat from "./Chat";
 import Loading from "../utils/Loading";
 import { useRef } from "react";
 import { useEffect } from "react";
+import ImgSkeleton from "../utils/ImgSkelaton";
 
 const ChatContainer = () => {
   const { isResponseLoading, currentChatsHistory } = useChatStore(
     (state) => state
   );
+  const { imageGenerationOn } = useImageStore((store) => store);
 
-  console.log("chats from chat container ", currentChatsHistory);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const ChatContainer = () => {
         />
       ))}
 
-      {isResponseLoading && <Loading />}
+      {isResponseLoading && (imageGenerationOn ? <ImgSkeleton /> : <Loading />)}
     </div>
   );
 };

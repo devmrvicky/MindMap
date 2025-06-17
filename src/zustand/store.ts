@@ -109,6 +109,11 @@ const useChatStore = create<StoreState>((set) => ({
       model: "sarvamai/sarvam-m:free",
       label: "free",
     },
+    {
+      name: "Kimi dev",
+      model: "moonshotai/kimi-dev-72b:free",
+      label: "free",
+    },
   ],
   // image models
   imageModels: [
@@ -201,4 +206,12 @@ const useImageStore = create<ImageStoreState>((set) => ({
     })),
 }));
 
-export { useChatStore, useAuthStore, useImageStore };
+const useThemeStore = create<ThemeStoreState>((set) => ({
+  isDarkMode: false,
+  setDarkMode: (isDark: boolean) =>
+    set(() => ({
+      isDarkMode: isDark,
+    })),
+}));
+
+export { useChatStore, useAuthStore, useImageStore, useThemeStore };
