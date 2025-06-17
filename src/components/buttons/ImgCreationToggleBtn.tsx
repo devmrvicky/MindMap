@@ -1,5 +1,4 @@
 import { ImagePlus } from "lucide-react";
-import { Button } from "../ui/button";
 import { useImageStore } from "@/zustand/store";
 import { Toggle } from "@/components/ui/toggle";
 

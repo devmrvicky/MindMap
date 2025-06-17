@@ -16,7 +16,7 @@ function App() {
 
   const { user, login, logout } = useAuthStore((store) => store);
 
-  const {isDarkMode, setDarkMode} = useThemeStore((store) => store);
+  const { setDarkMode } = useThemeStore((store) => store);
 
   useEffect(() => {
     (async function () {
@@ -92,7 +92,9 @@ function App() {
 
   useEffect(() => {
     // check system theme
-    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDarkMode = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     console.log("isDarkMode: ", isDarkMode);
     setDarkMode(isDarkMode);
     if (isDarkMode) {
@@ -100,7 +102,7 @@ function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [])
+  }, []);
 
   return (
     <div>

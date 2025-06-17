@@ -4,7 +4,6 @@ import { ChevronRight } from "lucide-react";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import ChatActionsBtns from "../ChatActionsBtns";
-import ImgWithSkeleton from "../utils/ImgWithSketeton";
 import ImgPopup from "../utils/ImgPopup";
 
 const Chat = ({
