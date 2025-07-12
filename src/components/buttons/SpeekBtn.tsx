@@ -1,4 +1,4 @@
-import { Volume, Square, ChevronDown } from "lucide-react";
+import { Square, ChevronDown, Volume2 } from "lucide-react";
 import { Button } from "../ui/button";
 import useWebSpeech from "@/hooks/useWebSpeech";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -10,19 +10,19 @@ const SpeekBtn = ({ text }: { text: string }) => {
     useState<SpeechSynthesisVoice | null>(null);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex border rounded-2xl items-center">
       {!isSpeaking ? (
         <>
           <Button
             variant="outline"
-            className="cursor-pointer"
+            className="cursor-pointer border-none"
             onClick={() =>
               handleStartSpeak({ text, selectedVoice: selectedVoice })
             }
             disabled={isSpeaking}
             title="Speak"
           >
-            <Volume />
+            <Volume2 />
           </Button>
           <SeleteVoices
             selectedVoice={selectedVoice}
@@ -32,7 +32,7 @@ const SpeekBtn = ({ text }: { text: string }) => {
       ) : (
         <Button
           variant="outline"
-          className="cursor-pointer"
+          className="cursor-pointer border-none"
           onClick={handleStopSpeak}
           disabled={!isSpeaking}
           title="Stop"
@@ -77,7 +77,7 @@ const SeleteVoices = ({
     <>
       <Button
         variant="outline"
-        className="cursor-pointer"
+        className="cursor-pointer border-none"
         onClick={() => setDialogOpen(true)}
         title="Choose Voice"
       >

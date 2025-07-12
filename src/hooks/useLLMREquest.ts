@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router";
 import useCreateData from "./useCreateData";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { updateData } from "@/indexDB/indexDB";
 
 const useLLMRequest = () => {
   const {
@@ -14,6 +15,7 @@ const useLLMRequest = () => {
     setLLMResponsedError,
     currentLLMModel,
     activeChatRoom,
+    updateChat,
   } = useChatStore((state) => state);
 
   const { imageGenerationOn } = useImageStore((state) => state);
@@ -46,6 +48,7 @@ Logic:
     onLimitReached?: () => void
   ): Promise<string | undefined> {
     try {
+      setLLMResponsedError(""); // reset the error state
       let activeChatRoomId = param.chatRoomId || activeChatRoom?.chatRoomId;
 
       // let userChat: Chat;
@@ -87,7 +90,7 @@ Logic:
             currentChatsHistory
               .map((chat) => ({
                 role: chat.role,
-                content: chat.content,
+                content: chat.content[0].content,
               }))
               .slice(-5) // send the last 5 messages to the server
           ), // send the previous response to the server
@@ -117,6 +120,7 @@ Logic:
       });
       if (error === "ERROR_OCCUR") {
         setIsResponseLoading(false);
+        setLLMResponsedError("Error in response from server");
         return;
       }
       // set the response loading state to false
@@ -127,10 +131,92 @@ Logic:
         toast.error(error.response?.data.message, {
           toastId: "chat request error",
         });
+        setLLMResponsedError(
+          error.response?.data.message || "An error occurred"
+        );
+      } else {
+        setLLMResponsedError(
+          "An error occurred while sending the chat request"
+        );
+        toast.error("An error occurred while sending the chat request");
+        console.error("Error sending chat request:", error);
       }
-      console.error("Error sending chat request:", error);
       setIsResponseLoading(false);
       return undefined;
+    }
+  }
+
+  async function getLLMRegeneratedResponse({
+    chatId,
+    query,
+    model,
+    prevResponse,
+  }: {
+    chatId: string;
+    query: string;
+    model: string;
+    prevResponse: Chat[];
+  }) {
+    try {
+      setIsResponseLoading(true);
+      const aiResponse = await axiosConfig.post("chat/regenerate", {
+        chatId,
+        query,
+        model,
+        prevResponse: JSON.stringify(
+          prevResponse.map((chat) => ({
+            role: chat.role,
+            content: chat.content[0].content,
+          }))
+        ),
+      });
+      // handle axios error
+      if (aiResponse?.status !== 200) {
+        console.error("Error in response from server");
+        setIsResponseLoading(false);
+        setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
+        return;
+      }
+      // update zustand local store
+      updateChat({
+        chatId,
+        content: aiResponse.data.response.choices[0].message.content,
+        model: aiResponse.data.response.choices[0].message.model,
+      });
+      // update indexDB store
+      const targetChat = currentChatsHistory.find(
+        (chat) => chat.chatId === chatId
+      );
+      if (!targetChat) {
+        console.error("Chat not found in current chats history");
+        return;
+      }
+      targetChat?.content.push({
+        content: aiResponse.data.response.choices[0].message.content,
+        type: "text",
+        model: aiResponse.data.response.choices[0].message.model,
+      });
+      console.log(targetChat);
+      updateData({
+        storeName: "chat",
+        data: targetChat,
+      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message, {
+          toastId: "chat request error",
+        });
+        setLLMResponsedError(
+          error.response?.data.message || "An error occurred"
+        );
+      } else {
+        setLLMResponsedError(
+          "An error occurred while sending the chat request"
+        );
+        toast.error("An error occurred while sending the chat request");
+        console.error("Error sending chat request:", error);
+      }
+      setIsResponseLoading(false);
     }
   }
 
@@ -177,7 +263,7 @@ Logic:
   //   chatsHistory,
   // ]);
 
-  return { getLLMResponse };
+  return { getLLMResponse, getLLMRegeneratedResponse };
 };
 
 export default useLLMRequest;

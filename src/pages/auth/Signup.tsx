@@ -18,12 +18,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-zinc-900 px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           {/* <h1 className="text-2xl font-bold text-black">ChatGPT</h1> */}
           <Logo />
-          <h2 className="text-3xl font-bold mt-6 mb-4 text-black">
+          <h2 className="text-3xl font-bold mt-6 mb-4 text-black dark:text-white">
             Create an account
           </h2>
         </div>

@@ -4,9 +4,12 @@ declare global {
   interface Chat {
     chatId: string;
     role: "user" | "assistant";
-    content: string;
+    content: {
+      content: string;
+      type: "text" | "image";
+      model: string;
+    }[];
     chatRoomId: string;
-    usedModel: string;
   }
 
   interface Model {
@@ -19,6 +22,11 @@ declare global {
     chatsHistory: Chat[];
     setChatsHistory: (chats: Chat[]) => void;
     addNewChat: (newChat: Chat) => void;
+    updateChat: (updatedChat: {
+      chatId: string;
+      content: string;
+      model: string;
+    }) => void;
     currentChatsHistory: Chat[];
     setCurrentChatsHistory: (chats: Chat[]) => void;
     isResponseLoading: boolean;
@@ -97,7 +105,6 @@ declare global {
     imageGenerationError: string;
     setImageGenerationError: (error: string) => void;
   }
-
 
   interface ThemeStoreState {
     isDarkMode: boolean;

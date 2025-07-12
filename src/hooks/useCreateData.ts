@@ -83,9 +83,14 @@ const useCreateData = () => {
     const newChat: Chat = {
       chatId: uuidv1(),
       role,
-      content,
+      content: [
+        {
+          content,
+          type: "text",
+          model: currentLLMModel,
+        },
+      ],
       chatRoomId: activeChatRoomId,
-      usedModel: currentLLMModel,
     };
 
     // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
@@ -100,7 +105,12 @@ const useCreateData = () => {
       if (user) {
         const chatRes = await axiosConfig.post(
           `/chat/create/${activeChatRoomId}`,
-          newChat
+          {
+            content: content,
+            usedModel: currentLLMModel,
+            chatId: newChat.chatId,
+            role: role,
+          }
         );
         console.log("chat created : ", chatRes);
       }
