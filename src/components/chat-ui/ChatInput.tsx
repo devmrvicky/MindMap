@@ -1,7 +1,7 @@
 import { useChatStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ArrowUp, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
