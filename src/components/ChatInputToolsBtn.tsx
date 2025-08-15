@@ -1,5 +1,4 @@
-import { Label } from "@radix-ui/react-label";
-import { Globe, Paperclip } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Button } from "./ui/button";
 import MicBtn from "./buttons/MicBtn";
 import ImgCreationToogleBtn from "./buttons/ImgCreationToggleBtn";

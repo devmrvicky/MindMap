@@ -13,10 +13,13 @@ import axiosConfig from "@/axios/axiosConfig";
 import { useRef, useState } from "react";
 
 const FileUploadBtn = () => {
-  const { addImg, setWantToImgUpload, updateImg } = useChatStore((store) => store);
+  const { addImg, setWantToImgUpload, updateImg } = useChatStore(
+    (store) => store
+  );
 
   // State to keep track of the current upload progress (percentage)
   const [progress, setProgress] = useState(0);
+  console.log(progress);
 
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
