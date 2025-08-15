@@ -27,6 +27,7 @@ const ChatContainer = () => {
       {currentChatsHistory.map((message, index) => (
         <Chat
           key={message.chatId}
+          // fileUrls={message.fileUrls}
           message={message}
           index={index}
           totalChats={currentChatsHistory.length}

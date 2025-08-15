@@ -1,8 +1,8 @@
 import { useChatStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
-import { useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowUp, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import LoginDialog from "../LoginDialog";
@@ -18,7 +18,9 @@ const ChatInput = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { getLLMResponse } = useLLMRequest();
-  const { currentChatsHistory } = useChatStore((state) => state);
+  const { currentChatsHistory, uploadedImgs, wantToImgUpload } = useChatStore(
+    (state) => state
+  );
 
   const isMobile = useIsMobile();
 
@@ -41,6 +43,41 @@ const ChatInput = () => {
           : ""
       }`}
     >
+      {wantToImgUpload && uploadedImgs.length === 0 && (
+        <div className="w-full flex items-center gap-2 mb-2 top-[0px]  overflow-x-auto relative z-0">
+          <div className="w-[80px] h-[80px] rounded border flex items-center justify-center">
+            <Loader className="spin " />
+          </div>
+        </div>
+      )}
+
+      {/* uploaded images */}
+      {uploadedImgs.length > 0 && (
+        <div className="w-full flex items-center gap-2 mb-2 top-[0px]  overflow-x-auto relative z-0">
+          {/* {wantToImgUpload && (
+            <div className="w-[80px] h-[80px] rounded border flex items-center justify-center">
+              <Loader className="spin " />
+            </div>
+          )} */}
+          {uploadedImgs.map((img) => (
+            <div className="w-[80px] h-[80px] rounded border relative">
+              <img src={img.src} alt={img.name} className="w-fll h-full" />
+              <button
+                className="absolute top-0 right-0 text-red-500"
+                onClick={() => useChatStore.getState().removeImg(img.name)}
+              >
+                &times;
+              </button>
+              {wantToImgUpload && (
+                <div className="w-[80px] h-[80px] rounded border flex items-center justify-center absolute top-0 right-0">
+                  <Loader className="spin " />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       <Textarea
         placeholder="Ask me anything..."
         className={`rounded-2xl h-[50px] w-full  bg-white placeholder:text-lg dark:text-white text-black border-none focus:outline-none focus:ring-0 focus:border-none shadow-none resize-none`}
@@ -69,6 +106,8 @@ const ChatInput = () => {
       <div className="flex w-full">
         {/* <p>tools</p> */}
         <ChatInputToolsBtn setPrompt={setPrompt} />
+
+        {/* request submit button */}
         <Button
           variant="outline"
           className="bg-white rounded-full w-10 h-10 flex items-center justify-center mt-2 ml-auto cursor-pointer"

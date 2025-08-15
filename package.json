@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.1.0",
+    "@imagekit/react": "^5.0.1",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-collapsible": "^1.1.8",
     "@radix-ui/react-context-menu": "^2.2.12",

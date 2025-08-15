@@ -12,6 +12,7 @@ interface createChatRoomProps {
 }
 interface createChatProps {
   activeChatRoomId: ChatRoom["chatRoomId"];
+  fileUrls?: string[]; // array of file URLs
   content: string;
   role: "user" | "assistant";
 }
@@ -77,6 +78,7 @@ const useCreateData = () => {
   // create chats
   const createChat = async ({
     activeChatRoomId,
+    fileUrls,
     content,
     role,
   }: createChatProps) => {
@@ -85,6 +87,7 @@ const useCreateData = () => {
       role,
       content: [
         {
+          fileUrls,
           content,
           type: "text",
           model: currentLLMModel,
@@ -106,6 +109,7 @@ const useCreateData = () => {
         const chatRes = await axiosConfig.post(
           `/chat/create/${activeChatRoomId}`,
           {
+            fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
             content: content,
             usedModel: currentLLMModel,
             chatId: newChat.chatId,

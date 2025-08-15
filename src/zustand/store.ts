@@ -16,18 +16,22 @@ const useChatStore = create<StoreState>((set) => ({
   updateChat: (updatedChat: {
     chatId: string;
     content: string;
-    model: string
+    model: string;
   }) =>
     set((state) => {
-      const targetChat = state.currentChatsHistory.find(chat => chat.chatId === updatedChat.chatId);
+      const targetChat = state.currentChatsHistory.find(
+        (chat) => chat.chatId === updatedChat.chatId
+      );
       targetChat?.content.push({
         content: updatedChat.content,
         type: "text",
         model: updatedChat.model,
       });
       return {
-        currentChatsHistory: state.currentChatsHistory.map(chat =>
-          chat.chatId === updatedChat.chatId ? { ...chat, content: targetChat?.content || [] } : chat
+        currentChatsHistory: state.currentChatsHistory.map((chat) =>
+          chat.chatId === updatedChat.chatId
+            ? { ...chat, content: targetChat?.content || [] }
+            : chat
         ),
         // chatsHistory: state.chatsHistory.map(chat =>
         //   chat.chatId === updatedChat.chatId ? { ...chat, content: targetChat?.content || [] } : chat
@@ -160,6 +164,34 @@ const useChatStore = create<StoreState>((set) => ({
     set(() => ({
       currentLLMModel: model,
     })),
+
+  // image file store
+  uploadedImgs: [],
+  wantToImgUpload: false,
+  setWantToImgUpload: (doesUploaded: boolean) =>
+    set(() => ({
+      wantToImgUpload: doesUploaded,
+    })),
+  setUploadedImgs: (imgs: UploadedImg[]) =>
+    set(() => ({
+      uploadedImgs: imgs,
+    })),
+  addImg: (img: UploadedImg) =>
+    set((state) => ({
+      uploadedImgs: [img, ...state.uploadedImgs],
+    })),
+  removeImg: (targetImgName) =>
+    set((state) => ({
+      uploadedImgs: state.uploadedImgs.filter(
+        (img) => img.name !== targetImgName
+      ),
+    })),
+  updateImg: (img: UploadedImg) => set((state) => ({
+    uploadedImgs: state.uploadedImgs.map((i) =>
+      i.name === img.name ? img : i
+    ),
+
+  }))
 }));
 
 const useAuthStore = create<AuthStoreState>()(

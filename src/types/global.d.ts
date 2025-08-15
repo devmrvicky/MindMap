@@ -5,6 +5,7 @@ declare global {
     chatId: string;
     role: "user" | "assistant";
     content: {
+      fileUrls?: string[]; // optional field for file URLs
       content: string;
       type: "text" | "image";
       model: string;
@@ -45,6 +46,19 @@ declare global {
     deleteChatRoomFromLocal: (id: string, isActiveChatRoom: boolean) => void;
     isChatRoomsFetching: boolean;
     setIsChatRoomsFetching: (isFetching: boolean) => void;
+    uploadedImgs: UploadedImg[];
+    setUploadedImgs: (imgs: UploadedImg[]) => void;
+    addImg: (img: UploadedImg) => void;
+    removeImg: (targetImgName: string) => void;
+    updateImg: (img: UploadedImg) => void;
+    wantToImgUpload: boolean;
+    setWantToImgUpload: (doesUploaded: boolean) => void;
+
+  }
+
+  interface UploadedImg {
+    name: string;
+    src: string;
   }
 
   interface Chats {

@@ -35,6 +35,8 @@ const Chat = ({
   );
   const [currentActiveTabNo, setCurrentActiveTabNo] = useState<number>(1);
 
+  // console.log(message.content[0]);
+
   function getThinkingAndResponse(
     content: string,
     role: "user" | "assistant",
@@ -94,24 +96,40 @@ const Chat = ({
       ref={chatRef}
     >
       {message.role === "user" ? (
-        <div
-          className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none`}
-        >
-          {actualResponse.length > 200 ? (
-            <div
-              className="cursor-pointer"
-              onClick={() => setIsTruncated(!isTruncated)}
-            >
-              <Markdown>
-                {isTruncated
-                  ? actualResponse
-                  : actualResponse.slice(0, 200) + "..."}
-              </Markdown>
-            </div>
-          ) : (
-            <Markdown>{actualResponse}</Markdown>
-          )}
-        </div>
+        <>
+          {message.content[0].fileUrls &&
+            message.content[0].fileUrls?.length > 0 &&
+            message.content[0].fileUrls.map((imgSrc) => (
+              <div
+                key={imgSrc}
+                className="w-full h-full max-w-[250px] rounded border relative mb-2"
+              >
+                <ImgPopup
+                  src={imgSrc}
+                  className="w-full h-auto rounded-lg"
+                  prompt={""}
+                />
+              </div>
+            ))}
+          <div
+            className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none`}
+          >
+            {actualResponse.length > 200 ? (
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsTruncated(!isTruncated)}
+              >
+                <Markdown>
+                  {isTruncated
+                    ? actualResponse
+                    : actualResponse.slice(0, 200) + "..."}
+                </Markdown>
+              </div>
+            ) : (
+              <Markdown>{actualResponse}</Markdown>
+            )}
+          </div>
+        </>
       ) : (
         <>
           {noOfResponses >= 1 && (

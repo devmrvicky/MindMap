@@ -16,6 +16,8 @@ const useLLMRequest = () => {
     currentLLMModel,
     activeChatRoom,
     updateChat,
+    uploadedImgs,
+    setUploadedImgs
   } = useChatStore((state) => state);
 
   const { imageGenerationOn } = useImageStore((state) => state);
@@ -49,6 +51,7 @@ Logic:
   ): Promise<string | undefined> {
     try {
       setLLMResponsedError(""); // reset the error state
+
       let activeChatRoomId = param.chatRoomId || activeChatRoom?.chatRoomId;
 
       // let userChat: Chat;
@@ -69,6 +72,8 @@ Logic:
       // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (but only for role: user)
       const err = await createChat({
         activeChatRoomId,
+        fileUrls:
+          uploadedImgs.length > 0 ? uploadedImgs.map((img) => img.src) : [],
         content: prompt,
         role: "user",
       });
@@ -94,6 +99,10 @@ Logic:
               }))
               .slice(-5) // send the last 5 messages to the server
           ), // send the previous response to the server
+          fileUrls:
+            uploadedImgs.length > 0
+              ? uploadedImgs.map((img) => img.src)
+              : [],
         });
       }
       // handle axios error
@@ -103,6 +112,10 @@ Logic:
         setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
         return aiResponse.data;
       }
+
+      // reset the uploaded images state
+      setUploadedImgs([]);
+
       // console.log("AI response: ", aiResponse.data);
       let content: string;
       if (imageGenerationOn) {
