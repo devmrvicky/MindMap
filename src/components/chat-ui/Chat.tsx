@@ -10,6 +10,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css"; // Or any highlight.js theme
+import markdownToHTML from "@/methods/markdownToHTML";
+import HTML from "../HTML";
+import rehypeSanitize from "rehype-sanitize";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.css";
+import rehypeRaw from "rehype-raw";
+import remarkBreaks from "remark-breaks";
 
 const Chat = ({
   message,
@@ -87,6 +95,11 @@ const Chat = ({
     setNoOfResponses(message.content.length);
   }, [message.content.length, message.content[0].content]);
 
+  const handleConverToHTML = async () => {
+    const html = await markdownToHTML(actualResponse);
+    console.log(html);
+  };
+
   return (
     <div
       key={message.chatId}
@@ -94,6 +107,7 @@ const Chat = ({
         message.role === "user" ? "items-end" : "justify-star"
       }`}
       ref={chatRef}
+      onClick={handleConverToHTML}
     >
       {message.role === "user" ? (
         <>
@@ -119,14 +133,22 @@ const Chat = ({
                 className="cursor-pointer"
                 onClick={() => setIsTruncated(!isTruncated)}
               >
-                <Markdown>
+                {/* <Markdown>
                   {isTruncated
                     ? actualResponse
                     : actualResponse.slice(0, 200) + "..."}
-                </Markdown>
+                </Markdown> */}
+                <HTML
+                  actualResponse={
+                    isTruncated
+                      ? actualResponse
+                      : actualResponse.slice(0, 200) + "..."
+                  }
+                />
               </div>
             ) : (
-              <Markdown>{actualResponse}</Markdown>
+              // <Markdown>{actualResponse}</Markdown>
+              <HTML actualResponse={actualResponse} />
             )}
           </div>
         </>
@@ -170,12 +192,19 @@ const Chat = ({
             {chatType === "text" ? (
               // <Markdown>{actualResponse}</Markdown>
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
+                remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
+                rehypePlugins={[
+                  rehypeHighlight,
+                  rehypeSanitize,
+                  rehypeKatex,
+                  rehypeRaw,
+                ]}
               >
                 {actualResponse}
               </ReactMarkdown>
             ) : (
+              // <HTML actualResponse={actualResponse} />
+              // in case of image response actualResponse will be the image URL
               <ImgPopup
                 src={actualResponse}
                 className="w-full h-auto rounded-lg"

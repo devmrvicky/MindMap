@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import LogoutBtn from "./buttons/auth/LogoutBtn";
 import ThemeSwitcherBtns from "./buttons/ThemeSwitcherBtns";
+import { Link } from "react-router";
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
@@ -62,6 +63,19 @@ export function NavUser({ user }: { user: User }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <ThemeSwitcherBtns />
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {/* here will be listed all seting */}
+            <DropdownMenuLabel className="px-2 text-xs text-muted-foreground">
+              settings
+            </DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Link
+                to="/page/models"
+                className="w-full p-2 hover:bg-zinc-400 dark:hover:bg-zinc-800 rounded-xl"
+              >
+                Choose model
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

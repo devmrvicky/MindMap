@@ -11,4 +11,9 @@ const axiosConfig = axios.create({
   withCredentials: true,
 });
 
+const openrouterAxiosConfig = axios.create({
+  baseURL: "https://openrouter.ai/api/v1",
+});
+
 export default axiosConfig;
+export { openrouterAxiosConfig };

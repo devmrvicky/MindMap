@@ -90,8 +90,8 @@ function App() {
     }
   }, [activeChatRoom]);
 
+  // check system theme
   useEffect(() => {
-    // check system theme
     const isDarkMode = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;

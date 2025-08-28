@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useChatStore, useImageStore } from "@/zustand/store";
+import { openrouterAxiosConfig } from "@/axios/axiosConfig";
 
 export function ModelSwitcher() {
   const { chatModels, changeCurrentLLMModel, imageModels } = useChatStore(
@@ -28,6 +29,11 @@ export function ModelSwitcher() {
 
   const { imageGenerationOn } = useImageStore((store) => store);
   // console.log(activeModel);
+
+  const getAvailableModles = React.useCallback(async () => {
+    const data = await openrouterAxiosConfig.get("/models");
+    console.log(data);
+  }, []);
 
   React.useEffect(() => {
     if (activeModel) {
@@ -42,7 +48,7 @@ export function ModelSwitcher() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={getAvailableModles}>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"

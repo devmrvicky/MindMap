@@ -1,14 +1,18 @@
 const DB_NAME = import.meta.env.VITE_DB_NAME || "LLM_CHATS_DB";
-const storeNames: storeName[] = ["chat", "chatRoom"];
+const storeNames: storeName[] = ["chat", "chatRoom", "model"];
+
+const DB_VERSION = 2;
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       // console.log("creating object store");
       const db: IDBDatabase = (event.target as IDBOpenDBRequest).result;
+      console.log({ db });
       storeNames.forEach((storeName: storeName) => {
+        console.log(storeName);
         if (!db.objectStoreNames.contains(storeName)) {
           db.createObjectStore(storeName, {
             keyPath: storeName === "chatRoom" ? "chatRoomId" : "id",
@@ -28,16 +32,18 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
+// get all data from a given store
 export async function getAllData({
   storeName,
 }: {
   storeName: storeName;
-}): Promise<Chat[] | ChatRoom[]> {
+}): Promise<Chat[] | ChatRoom[] | Model[]> {
+  console.log({ storeName });
   const db = await openDB();
   return await new Promise((resolve, reject) => {
     const transaction: IDBTransaction = db.transaction([storeName], "readonly");
     const store: IDBObjectStore = transaction.objectStore(storeName);
-    const request = store.getAll() as IDBRequest<Chat[] | ChatRoom[]>;
+    const request = store.getAll() as IDBRequest<Chat[] | ChatRoom[] | Model[]>;
 
     request.onsuccess = () => {
       resolve(request.result);
@@ -49,6 +55,7 @@ export async function getAllData({
   });
 }
 
+// update or add data to a given store
 export async function updateData({
   data,
   storeName,
@@ -82,6 +89,7 @@ export async function updateData({
   });
 }
 
+// delete data from a given store by id
 export async function deleteData({
   id,
   storeName,
@@ -158,7 +166,9 @@ export async function setAllData({
       }
       data.forEach((item) => {
         const putRequest = store.put(
-          storeName === "chatRoom" ? { id: item.chatRoomId, ...item } : item
+          storeName === "chatRoom"
+            ? { id: (item as ChatRoom).chatRoomId, ...item }
+            : item
         );
         putRequest.onsuccess = () => {
           addCount++;

@@ -53,7 +53,6 @@ declare global {
     updateImg: (img: UploadedImg) => void;
     wantToImgUpload: boolean;
     setWantToImgUpload: (doesUploaded: boolean) => void;
-
   }
 
   interface UploadedImg {
@@ -75,19 +74,31 @@ declare global {
 
   type ActiveChatRoom = ChatRoom | null;
 
-  type storeName = "chat" | "chatRoom";
-  type Data = Chat | ChatRoom;
+  type storeName = "chat" | "chatRoom" | "model";
+  type Data = Chat | ChatRoom | Model;
 
-  // user store types
-  // interface UserStoreState {
-  //   user: User | null;
-  //   // setUser: (user: User) => void;
-  //   isLoggedIn: boolean;
-  //   login: (user: User | null) => void;
-  //   logout: () => void;
-  //   canUseWithoutAuth: boolean;
-  //   setCanUseWithoutAuth: (canUse: boolean) => void;
-  // }
+  interface Model {
+    id: string;
+    name: string;
+    description: string;
+    context_length: number;
+    architecture: {
+      modality: string;
+      input_modalities: string[];
+      output_modalities: string[];
+      tokenizer: string;
+      instruct_type: string;
+    };
+    pricing: {
+      prompt: string;
+      completion: string;
+      request: string;
+      image: string;
+      web_search: string;
+      internal_reasoning: string;
+    };
+    supported_parameters: string[];
+  }
 
   interface AuthStoreState {
     user: User | null;
