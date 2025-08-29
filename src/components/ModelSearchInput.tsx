@@ -2,9 +2,13 @@ import { SearchIcon } from "lucide-react";
 
 interface ModelSearchInputProps {
   searchModels: (searchParam: string) => void;
+  className?: string;
 }
 
-const ModelSearchInput = ({ searchModels }: ModelSearchInputProps) => {
+const ModelSearchInput = ({
+  searchModels,
+  className = "",
+}: ModelSearchInputProps) => {
   const handleModelsSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -14,7 +18,7 @@ const ModelSearchInput = ({ searchModels }: ModelSearchInputProps) => {
 
   return (
     <form
-      className="w-full max-w-[700px] flex items-center gap-4 border rounded-md p-2 px-4 mx-auto bg-[#151515]"
+      className={`w-full max-w-[700px] flex items-center gap-4 border rounded-md p-2 px-4 mx-auto bg-[#151515] ${className}`}
       onSubmit={handleModelsSearch}
     >
       <SearchIcon />

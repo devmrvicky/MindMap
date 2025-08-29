@@ -5,7 +5,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useChatStore, useThemeStore } from "@/zustand/store";
 
-const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
+const Logo = ({
+  isIconSpin,
+  className = "",
+}: {
+  isIconSpin?: boolean;
+  className?: string;
+}) => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [currentLogoIcon, setCurrentLogoIcon] = useState(
     isIconSpin ? logoGif : logoPng
@@ -25,7 +31,7 @@ const Logo = ({ isIconSpin }: { isIconSpin?: boolean }) => {
 
   return (
     <button
-      className="w-full flex items-center gap-2 p-2 justify-center cursor-pointer outline-none"
+      className={`w-full flex items-center gap-2 p-2 justify-center cursor-pointer outline-none ${className}`}
       onMouseEnter={() => {
         if (timeoutId) clearTimeout(timeoutId);
         setTimeoutId(

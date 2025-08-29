@@ -19,7 +19,6 @@ const FileUploadBtn = () => {
 
   // State to keep track of the current upload progress (percentage)
   const [progress, setProgress] = useState(0);
-  console.log(progress);
 
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +33,7 @@ const FileUploadBtn = () => {
       if (response.status !== 200) {
         throw new Error("Failed to retrieve authentication data");
       }
-      console.log(response.data);
+
       const { signature, expire, token, publicKey } = response.data.data;
       return { signature, expire, token, publicKey };
     } catch (error) {
@@ -96,7 +95,7 @@ const FileUploadBtn = () => {
         // Abort signal to allow cancellation of the upload if needed.
         abortSignal: abortController.signal,
       });
-      console.log("Upload response:", uploadResponse);
+      console.log("Upload response:", uploadResponse, progress);
       // update local store of uploaded images
       if (uploadResponse && uploadResponse.url) {
         updateImg({ name: file.name, src: uploadResponse.url });

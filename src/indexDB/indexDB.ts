@@ -1,7 +1,7 @@
 const DB_NAME = import.meta.env.VITE_DB_NAME || "LLM_CHATS_DB";
-const storeNames: storeName[] = ["chat", "chatRoom", "model"];
+const storeNames: storeName[] = ["chat", "chatRoom", "model", "currentlyUsedModels"];
 
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

@@ -1,3 +1,4 @@
+import { getAllData } from "@/indexDB/indexDB";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -93,50 +94,8 @@ const useChatStore = create<StoreState>((set) => ({
   // current llm model
   chatModels: [
     {
-      name: "Mistral 7B",
-      model: "mistralai/mistral-small-3.1-24b-instruct:free",
-      label: "free",
-    },
-    {
-      name: "Gemini 2.5 Pro",
-      model: "google/gemini-2.5-pro-exp-03-25:free",
-      label: "free",
-    },
-
-    {
-      name: "DeepSeek Base",
-      model: "deepseek/deepseek-v3-base:free",
-      label: "free",
-    },
-    {
-      name: "Llama 4 Maverick",
-      model: "meta-llama/llama-4-maverick:free",
-      label: "free",
-    },
-    {
-      name: "NVIDIA Llama Nano",
-      model: "nvidia/llama-3.1-nemotron-nano-8b-v1:free",
-      label: "free",
-    },
-    {
-      name: "Shisa v2 Llama3.3",
-      model: "shisa-ai/shisa-v2-llama3.3-70b:free",
-      label: "free",
-    },
-    { name: "DeepSeek R1", model: "deepseek/deepseek-r1", label: "paid" },
-    {
-      name: "DeepSeek R1 Free",
-      model: "deepseek/deepseek-r1:free",
-      label: "free",
-    },
-    {
-      name: "Sarvamai",
-      model: "sarvamai/sarvam-m:free",
-      label: "free",
-    },
-    {
-      name: "Kimi dev",
-      model: "moonshotai/kimi-dev-72b:free",
+      name: "Mistral 24b",
+      id: "mistralai/mistral-small-3.1-24b-instruct:free",
       label: "free",
     },
   ],
@@ -144,26 +103,45 @@ const useChatStore = create<StoreState>((set) => ({
   imageModels: [
     {
       name: "Black forest labs flux schnell",
-      model: "black-forest-labs/flux-schnell",
+      id: "black-forest-labs/flux-schnell",
       label: "free",
     },
     {
       name: "Black forest labs flux dev",
-      model: "black-forest-labs/flux-dev",
+      id: "black-forest-labs/flux-dev",
       label: "free",
     },
 
     {
       name: "Stability ai sdxl",
-      model: "stability-ai/sdxl",
+      id: "stability-ai/sdxl",
       label: "free",
     },
   ],
-  currentLLMModel: "mistralai/mistral-small-3.1-24b-instruct:free",
-  changeCurrentLLMModel: (model: string) =>
+  currentLLMModel: {
+    name: "Mistral 24b",
+    id: "mistralai/mistral-small-3.1-24b-instruct:free",
+    label: "free",
+  },
+  changeCurrentLLMModel: (model: Partial<Model>) =>
     set(() => ({
       currentLLMModel: model,
     })),
+  toggleChatModel: (model: Partial<Model>) =>
+    set((state) => ({
+      // add model if current model doesn't exit in list and remove if it exists
+
+      chatModels: state.chatModels.find((m) => m.id === model.id)
+        ? state.chatModels.filter((m) => m.id !== model.id)
+        : [...state.chatModels, model],
+    })),
+  setChatModels: (models: Partial<Model>[]) =>
+    set(() => {
+      getAllData({ storeName: "currentlyUsedModels" }).then((res) => {
+        console.log(res);
+      });
+      return { chatModels: models };
+    }),
 
   // image file store
   uploadedImgs: [],
@@ -186,12 +164,12 @@ const useChatStore = create<StoreState>((set) => ({
         (img) => img.name !== targetImgName
       ),
     })),
-  updateImg: (img: UploadedImg) => set((state) => ({
-    uploadedImgs: state.uploadedImgs.map((i) =>
-      i.name === img.name ? img : i
-    ),
-
-  }))
+  updateImg: (img: UploadedImg) =>
+    set((state) => ({
+      uploadedImgs: state.uploadedImgs.map((i) =>
+        i.name === img.name ? img : i
+      ),
+    })),
 }));
 
 const useAuthStore = create<AuthStoreState>()(

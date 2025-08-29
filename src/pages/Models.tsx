@@ -6,19 +6,28 @@
 
 import { Suspense, useState } from "react";
 import { MagicCard } from "@/components/magicui/magic-card";
-import getModels from "@/methods/getModels";
+import useModels from "@/hooks/useModels";
 import { useEffect } from "react";
-import GetLatestModelBtn from "@/components/buttons/getLatestModelsBtn";
 import { toast } from "react-toastify";
 import ModelSortBtn from "@/components/buttons/ModelSortBtn";
-import ModelFilterBtn from "@/components/buttons/modelFilterBtn";
 import ModelSearchInput from "@/components/ModelSearchInput";
+import { Switch } from "@/components/ui/switch";
+import { useChatStore } from "@/zustand/store";
+import GetLatestModelBtn from "@/components/buttons/GetLatestModelsBtn";
+import ModelFilterBtn from "@/components/buttons/ModelFilterBtn";
+import CopyBtn from "@/components/buttons/CopyBtn";
 
 const Models = () => {
   const [modelRefreshing, setModelRefreshing] = useState(false);
   const [currentAvailableModels, setCurrentAvailableModels] = useState<Model[]>(
     []
   );
+
+  const { getModels, toggleChatModelIndexDB } = useModels();
+
+  // get model list and toggle model function
+  const { chatModels } = useChatStore((state) => state);
+  console.log({ chatModels });
 
   // search models
   const searchModels = (searchParam: string) => {
@@ -79,6 +88,22 @@ const Models = () => {
     }
   };
 
+  const handleCheckedChange = (model: Model) => {
+    if (chatModels.length === 1) {
+      if (chatModels[0].id === model.id) {
+        toast.error("Atleast one model should be selected", {
+          toastId: "atleast-one-model",
+        });
+        return;
+      }
+    }
+    toggleChatModelIndexDB({
+      id: model.id,
+      name: model.name,
+      label: model.name.includes("(free)") ? "free" : "paid",
+    });
+  };
+
   useEffect(() => {
     (async () => {
       const models = await getModels({});
@@ -107,44 +132,29 @@ const Models = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {currentAvailableModels.map((model) => (
             <MagicCard key={model.id} className="p-2 rounded cursor-pointer">
-              <h2 className="text-lg mb-2">{model.name}</h2>
+              <div className="flex justify-between">
+                <h2 className="text-lg mb-2">{model.name}</h2>
+                <Switch
+                  checked={
+                    chatModels.find((m) => m.id === model.id) ? true : false
+                  }
+                  onCheckedChange={() => handleCheckedChange(model)}
+                  className="cursor-pointer"
+                />
+              </div>
+              <div className="flex items-center gap-4 mb-1">
+                <span className="text-xs">{model.id}</span>
+                <CopyBtn
+                  text={model.id}
+                  className="border-none p-0 bg-transparent"
+                />
+              </div>
               <p className="text-gray-600 mb-2">
                 {model.description.slice(0, 100) + "..."}
               </p>
               <p className="text-sm text-gray-500 mb-1">
                 Context Length: {model.context_length} tokens
               </p>
-              {/* <div className="text-sm text-gray-500 mb-1">
-                <strong>Architecture:</strong>
-                <ul className="list-disc list-inside">
-                  <li>Modality: {model.architecture.modality}</li>
-                  <li>
-                    Input Modalities:{" "}
-                    {model.architecture.input_modalities.join(", ")}
-                  </li>
-                  <li>
-                    Output Modalities:{" "}
-                    {model.architecture.output_modalities.join(", ")}
-                  </li>
-                  <li>Tokenizer: {model.architecture.tokenizer}</li>
-                  <li>Instruct Type: {model.architecture.instruct_type}</li>
-                </ul>
-              </div>
-              <div className="text-sm text-gray-500 mb-1">
-                <strong>Pricing (per 1K tokens):</strong>
-                <ul className="list-disc list-inside">
-                  <li>Prompt: ${model.pricing.prompt}</li>
-                  <li>Completion: ${model.pricing.completion}</li>
-                  <li>Request: ${model.pricing.request}</li>
-                  <li>Image: ${model.pricing.image}</li>
-                  <li>Web Search: ${model.pricing.web_search}</li>
-                  <li>Internal Reasoning: ${model.pricing.internal_reasoning}</li>
-                </ul>
-              </div>
-              <div className="text-sm text-gray-500">
-                <strong>Supported Parameters:</strong>{" "}
-                {model.supported_parameters.join(", ")}
-              </div> */}
             </MagicCard>
           ))}
         </div>

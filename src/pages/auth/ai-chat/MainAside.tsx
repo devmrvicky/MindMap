@@ -5,10 +5,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import ChatUI from "../chat-ui/ChatUI";
-import { ModelSwitcher } from "../ModelSwitcher";
-import SignupPageNavigationBtn from "../buttons/auth/SignupPageNavigationBtn";
-import LoginPageNavigationBtn from "../buttons/auth/LoginPageNavigationBtn";
+import ChatUI from "../../../components/chat-ui/ChatUI";
+import { ModelSwitcher } from "../../../components/ModelSwitcher";
+import SignupPageNavigationBtn from "../../../components/buttons/auth/SignupPageNavigationBtn";
+import LoginPageNavigationBtn from "../../../components/buttons/auth/LoginPageNavigationBtn";
 import { useAuthStore } from "@/zustand/store";
 
 export default function MainAside() {

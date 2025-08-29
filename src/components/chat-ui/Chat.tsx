@@ -1,4 +1,3 @@
-import Markdown from "react-markdown";
 import { RefObject, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Collapsible } from "@radix-ui/react-collapsible";
@@ -9,9 +8,6 @@ import { Button } from "../ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css"; // Or any highlight.js theme
-import markdownToHTML from "@/methods/markdownToHTML";
-import HTML from "../HTML";
 import rehypeSanitize from "rehype-sanitize";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -95,11 +91,6 @@ const Chat = ({
     setNoOfResponses(message.content.length);
   }, [message.content.length, message.content[0].content]);
 
-  const handleConverToHTML = async () => {
-    const html = await markdownToHTML(actualResponse);
-    console.log(html);
-  };
-
   return (
     <div
       key={message.chatId}
@@ -107,7 +98,6 @@ const Chat = ({
         message.role === "user" ? "items-end" : "justify-star"
       }`}
       ref={chatRef}
-      onClick={handleConverToHTML}
     >
       {message.role === "user" ? (
         <>
@@ -133,22 +123,22 @@ const Chat = ({
                 className="cursor-pointer"
                 onClick={() => setIsTruncated(!isTruncated)}
               >
-                {/* <Markdown>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                >
                   {isTruncated
                     ? actualResponse
                     : actualResponse.slice(0, 200) + "..."}
-                </Markdown> */}
-                <HTML
-                  actualResponse={
-                    isTruncated
-                      ? actualResponse
-                      : actualResponse.slice(0, 200) + "..."
-                  }
-                />
+                </ReactMarkdown>
               </div>
             ) : (
-              // <Markdown>{actualResponse}</Markdown>
-              <HTML actualResponse={actualResponse} />
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}
+              >
+                {actualResponse}
+              </ReactMarkdown>
             )}
           </div>
         </>

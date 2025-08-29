@@ -1,10 +1,10 @@
-import MainAside from "./components/sidebars/MainAside.tsx";
 import { useAuthStore, useChatStore, useThemeStore } from "@/zustand/store.ts";
 import { useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import axiosConfig from "./axios/axiosConfig.ts";
 import { clearStore, getAllData, setAllData } from "./indexDB/indexDB.ts";
 import { AxiosError } from "axios";
+import { Outlet } from "react-router";
 
 function App() {
   const {
@@ -12,6 +12,7 @@ function App() {
     setChatRooms,
     setChatsHistory,
     setIsChatRoomsFetching,
+    setChatModels,
   } = useChatStore((store) => store);
 
   const { user, login, logout } = useAuthStore((store) => store);
@@ -31,12 +32,7 @@ function App() {
         }
       } catch (error) {
         logout();
-        console.log(error);
-        // toast.error(
-        //   error instanceof AxiosError
-        //     ? error.response?.data.message
-        //     : "Unknown error"
-        // );
+        console.error(error);
       }
     })();
   }, [login, logout]);
@@ -104,11 +100,21 @@ function App() {
     }
   }, []);
 
+  // new useEffect for getting model from indexDB and update model store
+  useEffect(() => {
+    (async () => {
+      const models = (await getAllData({
+        storeName: "currentlyUsedModels",
+      })) as Partial<Model>[];
+      console.log(models);
+      setChatModels(models);
+    })();
+  }, []);
+
   return (
     <div>
-      {/* <ChatUI /> */}
-      <MainAside />
       <ToastContainer />
+      <Outlet />
     </div>
   );
 }

@@ -31,9 +31,6 @@ const useDeleteData = () => {
 
   const deleteChatRoom = async ({ chatRoomIds }: { chatRoomIds: string[] }) => {
     // if user is logged in then delete chat room from mongoDB first then delete it from indexDB
-    console.log(chatRoomIds);
-    console.log({ user });
-    // return;
     setDeleting(true);
     if (user) {
       try {
@@ -44,7 +41,6 @@ const useDeleteData = () => {
           `/chat/all/delete/${chatRoomIds[0]}`
         );
         toast.success(res.data.deletedCount + " chats deleted successfully.");
-        console.log("deleting chat room from mongoDB");
       } catch (error) {
         console.error("Error deleting chat room from MongoDB:", error);
         toast.error("Error while deleting chats", {

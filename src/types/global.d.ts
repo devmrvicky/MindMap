@@ -13,11 +13,11 @@ declare global {
     chatRoomId: string;
   }
 
-  interface Model {
-    name: string;
-    model: string;
-    label: "free" | "paid";
-  }
+  // interface Model {
+  //   name: string;
+  //   model: string;
+  //   label: "free" | "paid";
+  // }
 
   interface StoreState {
     chatsHistory: Chat[];
@@ -33,11 +33,15 @@ declare global {
     isResponseLoading: boolean;
     setIsResponseLoading: (isLoading: boolean) => void;
     LLMResponsedError: string;
-    chatModels: Model[];
-    imageModels: Model[];
+    // partial Model type I want only id, name and label fields here not all Model type fields
+    chatModels: Partial<Model>[];
+    imageModels: Partial<Model>[];
     setLLMResponsedError: (error: string) => void;
-    currentLLMModel: string;
-    changeCurrentLLMModel: (model: string) => void;
+    currentLLMModel: Partial<Model>;
+    changeCurrentLLMModel: (model: Partial<Model>) => void;
+    toggleChatModel: (model: Partial<Model>) => void;
+    setChatModels: (models: Partial<Model>[]) => void;
+
     chatRooms: ChatRoom[];
     setChatRooms: (chatRooms: ChatRoom[]) => void;
     activeChatRoom: ActiveChatRoom;
@@ -74,14 +78,15 @@ declare global {
 
   type ActiveChatRoom = ChatRoom | null;
 
-  type storeName = "chat" | "chatRoom" | "model";
-  type Data = Chat | ChatRoom | Model;
+  type storeName = "chat" | "chatRoom" | "model" | "currentlyUsedModels";
+  type Data = Chat | ChatRoom | Model | Partial<Model>;
 
   interface Model {
     id: string;
     name: string;
     description: string;
     context_length: number;
+    label?: string;
     architecture: {
       modality: string;
       input_modalities: string[];

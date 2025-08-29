@@ -90,7 +90,7 @@ const useCreateData = () => {
           fileUrls,
           content,
           type: "text",
-          model: currentLLMModel,
+          model: currentLLMModel.id!,
         },
       ],
       chatRoomId: activeChatRoomId,
@@ -111,7 +111,7 @@ const useCreateData = () => {
           {
             fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
             content: content,
-            usedModel: currentLLMModel,
+            usedModel: currentLLMModel.id!,
             chatId: newChat.chatId,
             role: role,
           }

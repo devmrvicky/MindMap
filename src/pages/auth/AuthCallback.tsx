@@ -37,7 +37,7 @@ const AuthCallback = () => {
           },
           { withCredentials: true }
         );
-        console.log(res);
+
         const { message, user } = res.data;
         if (!user) {
           console.log("Login failed! user did not get.");

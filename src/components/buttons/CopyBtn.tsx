@@ -2,7 +2,13 @@ import { Check, Copy } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 
-const CopyBtn = ({ text }: { text: string }) => {
+const CopyBtn = ({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) => {
   const [isCopied, setIsCopied] = useState(false);
   const [timeOutId, setTimeOutId] = useState<NodeJS.Timeout>();
   if (!text) {
@@ -35,7 +41,7 @@ const CopyBtn = ({ text }: { text: string }) => {
       size="icon"
       onClick={() => copyToClipboard()}
       title={isCopied ? "Copied!" : "Copy to clipboard"}
-      className="cursor-pointer"
+      className={`cursor-pointer ${className}`}
     >
       {isCopied ? <Check size={20} /> : <Copy size={20} />}
     </Button>

@@ -17,7 +17,7 @@ const useLLMRequest = () => {
     activeChatRoom,
     updateChat,
     uploadedImgs,
-    setUploadedImgs
+    setUploadedImgs,
   } = useChatStore((state) => state);
 
   const { imageGenerationOn } = useImageStore((state) => state);
@@ -90,7 +90,7 @@ Logic:
       } else {
         aiResponse = await axiosConfig.post("/chat/generate", {
           query: prompt,
-          model: currentLLMModel,
+          model: currentLLMModel.id,
           prevResponse: JSON.stringify(
             currentChatsHistory
               .map((chat) => ({
@@ -100,9 +100,7 @@ Logic:
               .slice(-5) // send the last 5 messages to the server
           ), // send the previous response to the server
           fileUrls:
-            uploadedImgs.length > 0
-              ? uploadedImgs.map((img) => img.src)
-              : [],
+            uploadedImgs.length > 0 ? uploadedImgs.map((img) => img.src) : [],
         });
       }
       // handle axios error
@@ -232,49 +230,6 @@ Logic:
       setIsResponseLoading(false);
     }
   }
-
-  //? this useEffect should remove from this hook
-  // useEffect(() => {
-  //   if (param.chatRoomId) {
-  //     const chatRoom = chatRooms.find(
-  //       (chatRoom) => chatRoom.chatRoomId === param.chatRoomId
-  //     );
-  //     if (chatRoom) {
-  //       setActiveChatRoom(chatRoom);
-  //       setCurrentChatsHistory(
-  //         chatsHistory.filter((chat) => chat.chatRoomId === chatRoom.chatRoomId)
-  //         // .reverse()
-  //       );
-  //       // when any chatroom will be active then in background this code will get all chats from mongoDB and update current chat history
-  //       // axiosConfig
-  //       //   .get(`/chat/${chatRoom.chatRoomId}`)
-  //       //   .then((res) => {
-  //       //     const chats = res.data.chats;
-  //       //     setCurrentChatsHistory(chats);
-  //       //   })
-  //       //   .catch((error) => {
-  //       //     if (error instanceof AxiosError) {
-  //       //       toast.error(error.response?.data.message);
-  //       //     }
-  //       //     console.error(error);
-  //       //   });
-  //       // updateActiveChatRoom(chatRoom.id, currentChatsHistory);
-  //       // setIsChatRoomActive(true);
-  //     } else {
-  //       // setCurrentChatsHistory([]);
-  //       // If the chat room is not found, you can handle it accordingly (e.g., show an error message or redirect)
-  //       console.error("Chat room not found");
-  //       navigate("/"); // Redirect to home or another page
-  //     }
-  //   }
-  // }, [
-  //   param.chatRoomId,
-  //   chatRooms,
-  //   setActiveChatRoom,
-  //   setCurrentChatsHistory,
-  //   navigate,
-  //   chatsHistory,
-  // ]);
 
   return { getLLMResponse, getLLMRegeneratedResponse };
 };

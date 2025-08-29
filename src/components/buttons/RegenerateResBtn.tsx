@@ -18,7 +18,7 @@ const RegenerateResBtn = ({
 }: {
   chatId?: Chat["chatId"];
   errorRes?: boolean;
-  model?: string;
+  model?: Partial<Model>;
 }) => {
   const [currentUsedModel, setCurrentUsedModel] = useState(model);
   const { currentChatsHistory, currentLLMModel } = useChatStore(
@@ -26,7 +26,7 @@ const RegenerateResBtn = ({
   );
   const { getLLMRegeneratedResponse, getLLMResponse } = useLLMRequest();
 
-  const handleRegenerate = (changedModel?: string) => {
+  const handleRegenerate = (changedModel?: Partial<Model>) => {
     toast.info(
       "this feature is under development, please wait for the next update",
       {
@@ -51,7 +51,7 @@ const RegenerateResBtn = ({
       getLLMRegeneratedResponse({
         chatId: chatId || "",
         query,
-        model: changedModel || currentUsedModel || currentLLMModel,
+        model: " changedModel.id || currentUsedModel.id || currentLLMModel.id",
         prevResponse: currentChatsHistory
           .slice(0, indexOfResThatRegenerate - 1)
           .slice(-5),
@@ -77,7 +77,7 @@ const RegenerateResBtn = ({
         <RefreshCcw size={20} />
       </Button>
       <ChooseModel
-        model={currentUsedModel || currentLLMModel}
+        model={currentLLMModel}
         handleRegenerate={handleRegenerate}
       />
     </div>
@@ -88,8 +88,8 @@ const ChooseModel = ({
   model,
   handleRegenerate,
 }: {
-  model: string;
-  handleRegenerate: (changedModel?: string) => void;
+  model: Partial<Model>;
+  handleRegenerate: (changedModel?: Partial<Model>) => void;
 }) => {
   const { chatModels } = useChatStore((state) => state);
   return (
@@ -101,7 +101,7 @@ const ChooseModel = ({
           title="change model"
         >
           <span>
-            {chatModels.find((chatModel) => chatModel.model === model)?.name ??
+            {chatModels.find((chatModel) => chatModel.id === model.id)?.name ??
               "Unknown Model"}
           </span>
           <ChevronDown size={20} />
@@ -111,10 +111,10 @@ const ChooseModel = ({
         {chatModels.map((chatModel) => (
           <DropdownMenuItem
             key={chatModel.name}
-            defaultChecked={chatModel.model === model}
+            defaultChecked={chatModel.id === model.id}
             onClick={() => {
               // changeCurrentLLMModel(chatModel.model);
-              handleRegenerate(chatModel.model);
+              handleRegenerate(chatModel);
             }}
             // defaultValue=
           >

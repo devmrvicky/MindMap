@@ -16,39 +16,32 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useChatStore, useImageStore } from "@/zustand/store";
-import { openrouterAxiosConfig } from "@/axios/axiosConfig";
 
 export function ModelSwitcher() {
-  const { chatModels, changeCurrentLLMModel, imageModels } = useChatStore(
-    (state) => state
-  );
-  const [models, setModels] = React.useState(chatModels);
+  const { chatModels, changeCurrentLLMModel, imageModels, currentLLMModel } =
+    useChatStore((state) => state);
+  // const [models, setModels] = React.useState(() => [...chatModels]);
   const { isMobile } = useSidebar();
-
-  const [activeModel, setActiveModel] = React.useState(models[0]);
+  // console.log(chatModels);
+  const [activeModel, setActiveModel] = React.useState(currentLLMModel);
 
   const { imageGenerationOn } = useImageStore((store) => store);
   // console.log(activeModel);
 
-  const getAvailableModles = React.useCallback(async () => {
-    const data = await openrouterAxiosConfig.get("/models");
-    console.log(data);
-  }, []);
-
   React.useEffect(() => {
     if (activeModel) {
-      changeCurrentLLMModel(activeModel.model);
+      changeCurrentLLMModel(activeModel);
     }
   }, [activeModel, changeCurrentLLMModel]);
 
-  React.useEffect(() => {
-    setModels(imageGenerationOn ? imageModels : chatModels);
-  }, [imageGenerationOn]);
+  // React.useEffect(() => {
+  //   setModels(imageGenerationOn ? imageModels : chatModels);
+  // }, [imageGenerationOn]);
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu onOpenChange={getAvailableModles}>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
@@ -75,18 +68,18 @@ export function ModelSwitcher() {
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               models
             </DropdownMenuLabel>
-            {models.map((model) => (
+            {(imageGenerationOn ? imageModels : chatModels).map((model) => (
               <DropdownMenuItem
                 key={model.name}
                 onClick={() => setActiveModel(model)}
-                className="gap-2 p-2 border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer my-1 flex"
+                className="gap-2 p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer my-1 flex"
                 disabled={model.name === activeModel.name}
                 // onChange={}
               >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
+                <div className="flex size-6 items-center justify-center rounded-sm">
                   <AudioWaveform className="size-4 shrink-0" />
                 </div>
-                {model.name}
+                {model.id}
                 {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
                 {model.label === "paid" && (
                   <p className="text-right font-medium text-yellow-400 ml-auto">
@@ -95,7 +88,6 @@ export function ModelSwitcher() {
                 )}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
