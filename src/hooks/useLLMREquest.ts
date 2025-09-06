@@ -1,24 +1,26 @@
-import axiosConfig from "@/axios/axiosConfig";
-import { useChatStore, useImageStore } from "@/zustand/store";
-// import { useEffect } from "react";
+import {
+  useChatRoomStore,
+  useImageStore,
+  useImageUploadStore,
+  useModelStore,
+} from "@/zustand/store";
 import { v1 as uuidv1 } from "uuid";
 import { useParams, useNavigate } from "react-router";
 import useCreateData from "./useCreateData";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
-import { updateData } from "@/indexDB/indexDB";
+import LlmService from "../services/llmService";
+
+const llmService = new LlmService();
 
 const useLLMRequest = () => {
-  const {
-    currentChatsHistory,
-    setIsResponseLoading,
-    setLLMResponsedError,
-    currentLLMModel,
-    activeChatRoom,
-    updateChat,
-    uploadedImgs,
-    setUploadedImgs,
-  } = useChatStore((state) => state);
+  const { activeChatRoom } = useChatRoomStore((state) => state);
+
+  const { setIsResponseLoading, setLLMResponsedError, currentLLMModel } =
+    useModelStore((state) => state);
+  const { uploadedImgs, setUploadedImgs } = useImageUploadStore(
+    (store) => store
+  );
 
   const { imageGenerationOn } = useImageStore((state) => state);
 
@@ -47,6 +49,8 @@ Logic:
 
   async function getLLMResponse(
     prompt: string,
+    // setStreamResponse: Dispatch<SetStateAction<string>>,
+    // streamResponse: string,
     onLimitReached?: () => void
   ): Promise<string | undefined> {
     try {
@@ -84,31 +88,17 @@ Logic:
       let aiResponse;
       if (imageGenerationOn) {
         // if image generation is on then send the request to the image generation endpoint
-        aiResponse = await axiosConfig.post("/chat/image/generate", {
+        aiResponse = await llmService.getImageResponse({
           prompt,
+          model: currentLLMModel.id!,
         });
       } else {
-        aiResponse = await axiosConfig.post("/chat/generate", {
-          query: prompt,
-          model: currentLLMModel.id,
-          prevResponse: JSON.stringify(
-            currentChatsHistory
-              .map((chat) => ({
-                role: chat.role,
-                content: chat.content[0].content,
-              }))
-              .slice(-5) // send the last 5 messages to the server
-          ), // send the previous response to the server
-          fileUrls:
-            uploadedImgs.length > 0 ? uploadedImgs.map((img) => img.src) : [],
+        //? this code is responsible for genereate ai response at once
+        aiResponse = await llmService.getChatLlmResponse({
+          prompt,
+          model: currentLLMModel.id!,
+          fileUrls: uploadedImgs.map((img) => img.src),
         });
-      }
-      // handle axios error
-      if (aiResponse?.status !== 200) {
-        console.error("Error in response from server");
-        setIsResponseLoading(false);
-        setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
-        return aiResponse.data;
       }
 
       // reset the uploaded images state
@@ -118,9 +108,9 @@ Logic:
       let content: string;
       if (imageGenerationOn) {
         // if image generation is on then get the image url from the response
-        content = aiResponse.data.data.data[0].url;
+        content = aiResponse.data.data[0].url;
       } else {
-        content = aiResponse.data.response.choices[0].message.content;
+        content = aiResponse.choices[0].message.content;
       }
 
       // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (for role: assistant)
@@ -157,81 +147,81 @@ Logic:
     }
   }
 
-  async function getLLMRegeneratedResponse({
-    chatId,
-    query,
-    model,
-    prevResponse,
-  }: {
-    chatId: string;
-    query: string;
-    model: string;
-    prevResponse: Chat[];
-  }) {
-    try {
-      setIsResponseLoading(true);
-      const aiResponse = await axiosConfig.post("chat/regenerate", {
-        chatId,
-        query,
-        model,
-        prevResponse: JSON.stringify(
-          prevResponse.map((chat) => ({
-            role: chat.role,
-            content: chat.content[0].content,
-          }))
-        ),
-      });
-      // handle axios error
-      if (aiResponse?.status !== 200) {
-        console.error("Error in response from server");
-        setIsResponseLoading(false);
-        setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
-        return;
-      }
-      // update zustand local store
-      updateChat({
-        chatId,
-        content: aiResponse.data.response.choices[0].message.content,
-        model: aiResponse.data.response.choices[0].message.model,
-      });
-      // update indexDB store
-      const targetChat = currentChatsHistory.find(
-        (chat) => chat.chatId === chatId
-      );
-      if (!targetChat) {
-        console.error("Chat not found in current chats history");
-        return;
-      }
-      targetChat?.content.push({
-        content: aiResponse.data.response.choices[0].message.content,
-        type: "text",
-        model: aiResponse.data.response.choices[0].message.model,
-      });
-      console.log(targetChat);
-      updateData({
-        storeName: "chat",
-        data: targetChat,
-      });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message, {
-          toastId: "chat request error",
-        });
-        setLLMResponsedError(
-          error.response?.data.message || "An error occurred"
-        );
-      } else {
-        setLLMResponsedError(
-          "An error occurred while sending the chat request"
-        );
-        toast.error("An error occurred while sending the chat request");
-        console.error("Error sending chat request:", error);
-      }
-      setIsResponseLoading(false);
-    }
-  }
+  // async function getLLMRegeneratedResponse({
+  //   chatId,
+  //   query,
+  //   model,
+  //   prevResponse,
+  // }: {
+  //   chatId: string;
+  //   query: string;
+  //   model: string;
+  //   prevResponse: Chat[];
+  // }) {
+  //   try {
+  //     setIsResponseLoading(true);
+  //     const aiResponse = await axiosConfig.post("chat/regenerate", {
+  //       chatId,
+  //       query,
+  //       model,
+  //       prevResponse: JSON.stringify(
+  //         prevResponse.map((chat) => ({
+  //           role: chat.role,
+  //           content: chat.content[0].content,
+  //         }))
+  //       ),
+  //     });
+  //     // handle axios error
+  //     if (aiResponse?.status !== 200) {
+  //       console.error("Error in response from server");
+  //       setIsResponseLoading(false);
+  //       setLLMResponsedError("Error in response from server"); // here will actually be the error message from the llm
+  //       return;
+  //     }
+  //     // update zustand local store
+  //     updateChat({
+  //       chatId,
+  //       content: aiResponse.data.response.choices[0].message.content,
+  //       model: aiResponse.data.response.choices[0].message.model,
+  //     });
+  //     // update indexDB store
+  //     const targetChat = currentChatsHistory.find(
+  //       (chat) => chat.chatId === chatId
+  //     );
+  //     if (!targetChat) {
+  //       console.error("Chat not found in current chats history");
+  //       return;
+  //     }
+  //     targetChat?.content.push({
+  //       content: aiResponse.data.response.choices[0].message.content,
+  //       type: "text",
+  //       model: aiResponse.data.response.choices[0].message.model,
+  //     });
+  //     console.log(targetChat);
+  //     updateData({
+  //       storeName: "chat",
+  //       data: targetChat,
+  //     });
+  //   } catch (error) {
+  //     if (error instanceof AxiosError) {
+  //       toast.error(error.response?.data.message, {
+  //         toastId: "chat request error",
+  //       });
+  //       setLLMResponsedError(
+  //         error.response?.data.message || "An error occurred"
+  //       );
+  //     } else {
+  //       setLLMResponsedError(
+  //         "An error occurred while sending the chat request"
+  //       );
+  //       toast.error("An error occurred while sending the chat request");
+  //       console.error("Error sending chat request:", error);
+  //     }
+  //     setIsResponseLoading(false);
+  //   }
+  // }
 
-  return { getLLMResponse, getLLMRegeneratedResponse };
+  return { getLLMResponse };
 };
 
 export default useLLMRequest;

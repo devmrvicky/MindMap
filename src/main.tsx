@@ -8,7 +8,7 @@ import SignupPage from "./pages/auth/Signup.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
 import Models from "./pages/Models.tsx";
 import PageLayout from "./pages/PageLayout.tsx";
-import MainAside from "./pages/auth/ai-chat/MainAside.tsx";
+import MainAside from "./pages/ai-chat/MainAside.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

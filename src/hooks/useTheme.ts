@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useThemeStore } from "@/zustand/store.ts";
 
 type Theme = "light" | "dark" | "system";
 
@@ -41,5 +42,21 @@ const useTheme = () => {
 
   return { switchTheme, currentTheme };
 };
+
+export function useThemeInit() {
+  const { setDarkMode } = useThemeStore();
+
+  const applySystemTheme = useCallback(() => {
+    const isDarkMode = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    setDarkMode(isDarkMode);
+    document.documentElement.classList.toggle("dark", isDarkMode);
+  }, [setDarkMode]);
+
+  useEffect(() => {
+    applySystemTheme();
+  }, [applySystemTheme]);
+}
 
 export default useTheme;

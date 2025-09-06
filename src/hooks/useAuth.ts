@@ -1,11 +1,12 @@
-import axiosConfig from "@/axios/axiosConfig";
-import { useAuthStore, useChatStore } from "@/zustand/store";
+import { useCallback, useEffect } from "react";
+import { axiosConfig } from "@/api/axiosConfig";
+import { useAuthStore, useChatRoomStore } from "@/zustand/store";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import useDeleteData from "./useDeleteData";
 
 const useAuth = () => {
-  const { chatRooms } = useChatStore((store) => store);
+  const { chatRooms } = useChatRoomStore((store) => store);
   const { logout } = useAuthStore((store) => store);
 
   // import delete data function from useDeleteData hook
@@ -29,7 +30,7 @@ const useAuth = () => {
     }
   };
 
-  // c
+  // logout user and delete all data from indexDB
   const logoutAuth = async () => {
     try {
       await axiosConfig.post("/user/logout");
@@ -48,19 +49,36 @@ const useAuth = () => {
         toast.error(error.response?.data.message, {
           toastId: "logout failed",
         });
+      } else {
+        console.error("An unknown error occurred during logout:", error);
+        toast.error("An unknown error occurred during logout.", {
+          toastId: "logout failed",
+        });
       }
     }
   };
-
-  // login auth
-  // const loginAuth = async (user: User) => {
-  //   login(user)
-  // }
 
   return {
     redirectGoogleAuthUrl,
     logoutAuth,
   };
+};
+
+export const useAuthInit = () => {
+  const { login, logout } = useAuthStore((store) => store);
+  const checkUserSession = useCallback(async () => {
+    try {
+      const { data } = await axiosConfig.get("/user");
+      data?.user ? login(data.user) : logout();
+    } catch (error) {
+      logout();
+      console.error("User session check failed:", error);
+    }
+  }, [login, logout]);
+
+  useEffect(() => {
+    checkUserSession();
+  }, [checkUserSession]);
 };
 
 export default useAuth;

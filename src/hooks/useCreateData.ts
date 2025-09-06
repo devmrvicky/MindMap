@@ -1,9 +1,18 @@
-import axiosConfig from "@/axios/axiosConfig";
-import { updateData } from "@/indexDB/indexDB";
-import { useAuthStore, useChatStore } from "@/zustand/store";
+import { env } from "@/env/env";
+import {
+  useAuthStore,
+  useChatRoomStore,
+  useChatStore,
+  useModelStore,
+} from "@/zustand/store";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { v1 as uuidv1 } from "uuid";
+import { ChatRoomService } from "@/services/chatRoomService";
+import { ChatService } from "@/services/chatService";
+
+const chatRoom = new ChatRoomService();
+const chat = new ChatService();
 
 interface createChatRoomProps {
   activeChatRoomId: ChatRoom["chatRoomId"];
@@ -19,8 +28,11 @@ interface createChatProps {
 
 // this hook will be responsible for creating all data withing my app. like "Chat rooms", "Chats". this hook will create data on local indexDB and on mongoDB and also responsible for update zustand store to see changes in chat ui
 const useCreateData = () => {
-  const { createNewChatRoomOnLocal, addNewChat, currentLLMModel, chatRooms } =
-    useChatStore((store) => store);
+  const { addNewChat } = useChatStore((store) => store);
+  const { createNewChatRoomOnLocal, chatRooms } = useChatRoomStore(
+    (store) => store
+  );
+  const { currentLLMModel } = useModelStore((store) => store);
 
   const { user } = useAuthStore((store) => store);
 
@@ -33,12 +45,8 @@ const useCreateData = () => {
     try {
       // prevent user to create another chat room if user have already reached limit
       if (!user) {
-        if (chatRooms.length >= import.meta.env.VITE_FREE_CHAT_ROOMS) {
-          // navigate("/auth/login");
-          const id = toast.warn(
-            "You need to log in to continue using MindMap app."
-          );
-          console.log(id);
+        if (chatRooms.length >= env.VITE_FREE_CHAT_ROOMS_LIMIT) {
+          toast.warn("You need to log in to continue using MindMap app.");
           if (onLimitReached) onLimitReached();
           // throw new Error("LIMIT_RICHED");
           return "LIMIT_RICHED";
@@ -51,19 +59,8 @@ const useCreateData = () => {
       };
       // update zustand chat room store
       createNewChatRoomOnLocal(newChatRoom);
-      // create new chat room in indexDB
-      updateData({
-        data: newChatRoom,
-        storeName: "chatRoom",
-      });
-      // create chat room in mongoDB (condition: when user logged in means if user has value)
-      if (user) {
-        const chatRoom = await axiosConfig.post(
-          "/chat/room/create",
-          newChatRoom
-        );
-        console.log("create chat room successfully: ", chatRoom);
-      }
+      // create new chat room in indexDB and mongoDB
+      await chatRoom.createChatRoomInDB({ newChatRoom, user });
     } catch (error) {
       toast.error(
         error instanceof AxiosError
@@ -82,42 +79,26 @@ const useCreateData = () => {
     content,
     role,
   }: createChatProps) => {
-    const newChat: Chat = {
-      chatId: uuidv1(),
-      role,
-      content: [
-        {
-          fileUrls,
-          content,
-          type: "text",
-          model: currentLLMModel.id!,
-        },
-      ],
-      chatRoomId: activeChatRoomId,
-    };
-
-    // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
-    addNewChat(newChat);
-    // create new chat in indexDB
-    updateData({
-      data: newChat,
-      storeName: "chat",
-    });
     try {
-      // create chat in mongoDB(condition: when user logged in means if user has value)
-      if (user) {
-        const chatRes = await axiosConfig.post(
-          `/chat/create/${activeChatRoomId}`,
+      const newChat: Chat = {
+        chatId: uuidv1(),
+        role,
+        content: [
           {
-            fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
-            content: content,
-            usedModel: currentLLMModel.id!,
-            chatId: newChat.chatId,
-            role: role,
-          }
-        );
-        console.log("chat created : ", chatRes);
-      }
+            fileUrls,
+            content,
+            type: "text",
+            model: currentLLMModel.id!,
+          },
+        ],
+        chatRoomId: activeChatRoomId,
+      };
+
+      // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
+      addNewChat(newChat);
+
+      // create chat in mongoDB(condition: when user logged in means if user has value)
+      await chat.createChat({ chat: newChat, user });
     } catch (error) {
       toast.error(
         error instanceof AxiosError

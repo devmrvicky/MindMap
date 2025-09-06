@@ -1,4 +1,4 @@
-import { useChatStore, useImageStore } from "@/zustand/store";
+import { useImageStore, useModelStore, useChatStore } from "@/zustand/store";
 import Chat from "./Chat";
 import Loading from "../utils/Loading";
 import { useRef } from "react";
@@ -7,28 +7,37 @@ import ImgSkeleton from "../utils/ImgSkelaton";
 import { CircleAlert } from "lucide-react";
 import RegenerateResBtn from "../buttons/RegenerateResBtn";
 
-const ChatContainer = () => {
-  const { isResponseLoading, currentChatsHistory, LLMResponsedError } =
-    useChatStore((state) => state);
+const ChatContainer = ({ streamResponse }: { streamResponse: string }) => {
+  const { currentChatsHistory } = useChatStore((store) => store);
+  const { isResponseLoading, LLMResponsedError } = useModelStore(
+    (store) => store
+  );
   const { imageGenerationOn } = useImageStore((store) => store);
 
   const chatRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const smoothScrollToBottom = () => {
     setTimeout(() => {
       if (chatRef.current) {
         chatRef.current.scrollIntoView({ behavior: "smooth" });
       }
     }, 0);
-  }, [currentChatsHistory]);
+  };
+
+  useEffect(() => {
+    smoothScrollToBottom();
+  }, [currentChatsHistory.length]);
 
   return (
-    <div className="flex flex-col gap-4 w-full h-screen overflow-y-auto scrollbar-hide">
+    <div
+      className={`flex flex-col gap-4 w-full h-screen overflow-auto scrollable-container `}
+    >
       {currentChatsHistory.map((message, index) => (
         <Chat
           key={message.chatId}
           // fileUrls={message.fileUrls}
           message={message}
+          streamResponse={streamResponse}
           index={index}
           totalChats={currentChatsHistory.length}
           isLLmResponseLoading={isResponseLoading}
@@ -48,7 +57,7 @@ const ChatContainer = () => {
                 "An error occurred while processing your request."}
             </p>
           </div>
-          <RegenerateResBtn errorRes={Boolean(LLMResponsedError)}  />
+          <RegenerateResBtn errorRes={Boolean(LLMResponsedError)} />
         </div>
       )}
     </div>

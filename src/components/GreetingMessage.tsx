@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 const greetingMessages = [
   "Hi there! What can I help you explore today?",
@@ -54,13 +54,11 @@ const greetingMessages = [
 ];
 
 const GreetingMessageComp = () => {
-  const [randomGreetingMessage, setRandomGreetingMessage] =
-    useState<string>("");
-
-  useEffect(() => {
+  const randomGreetingMessage = useMemo(() => {
     const randomIndex = Math.floor(Math.random() * greetingMessages.length);
-    setRandomGreetingMessage(greetingMessages[randomIndex]);
+    return greetingMessages[randomIndex];
   }, []);
+
   return (
     <h1 className="text-2xl py-4 font-medium italic text-center">
       {randomGreetingMessage}

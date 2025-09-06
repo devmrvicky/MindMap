@@ -8,15 +8,11 @@ import { Button } from "../ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import rehypeSanitize from "rehype-sanitize";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.css";
-import rehypeRaw from "rehype-raw";
-import remarkBreaks from "remark-breaks";
 
 const Chat = ({
   message,
+  streamResponse,
   index,
   totalChats,
   isLLmResponseLoading,
@@ -24,6 +20,7 @@ const Chat = ({
   errorRes,
 }: {
   message: Chat;
+  streamResponse: string;
   index: number;
   totalChats: number;
   isLLmResponseLoading: boolean;
@@ -39,19 +36,40 @@ const Chat = ({
   );
   const [currentActiveTabNo, setCurrentActiveTabNo] = useState<number>(1);
 
-  // console.log(message.content[0]);
+  // const { isScrollDown, isScrollUp } = useScrollDetection();
 
-  function getThinkingAndResponse(
-    content: string,
-    role: "user" | "assistant",
-    str: string
-  ) {
-    if (role === "assistant" && content.includes(str)) {
-      let thinkingText = content.split(str)[0].replace(/^<think>|^◁think▷/, "");
-      // thinkingText = thinkingText.replace(/^<think>|^◁think▷/, "");
-      setThinking(thinkingText);
-      setActualResponse(content.split(str)[1]);
+  // console.log({ isScrollDown, isScrollUp });
+
+  function getThinkingAndResponse({
+    content,
+  }: // role: "user" | "assistant",
+  // str: string
+  {
+    content: string;
+  }) {
+    let isThinkingResponseAvailable: boolean = false;
+    const thinkingStrList = ["</think>", "◁/think▷"];
+    for (let thinkingStr of thinkingStrList) {
+      if (content.includes(thinkingStr)) {
+        let thinkingText = content
+          .split(thinkingStr)[0]
+          .replace(/^<think>|^◁think▷/, "");
+        // thinkingText = thinkingText.replace(/^<think>|^◁think▷/, "");
+        setThinking(thinkingText);
+        setActualResponse(content.split(thinkingStr)[1]);
+        isThinkingResponseAvailable = true;
+        return;
+      }
     }
+    if (!isThinkingResponseAvailable) {
+      setActualResponse(content);
+    }
+    // if (role === "assistant" && content.includes(str)) {
+    //   let thinkingText = content.split(str)[0].replace(/^<think>|^◁think▷/, "");
+    //   // thinkingText = thinkingText.replace(/^<think>|^◁think▷/, "");
+    //   setThinking(thinkingText);
+    //   setActualResponse(content.split(str)[1]);
+    // }
   }
 
   const handleChangeTab = (activeTabNo: number) => {
@@ -61,24 +79,10 @@ const Chat = ({
   };
 
   useEffect(() => {
-    if (message.content[currentActiveTabNo - 1].content.includes("</think>")) {
-      getThinkingAndResponse(
-        message.content[currentActiveTabNo - 1].content,
-        message.role,
-        "</think>"
-      );
-    } else if (
-      message.content[currentActiveTabNo - 1].content.includes("◁/think▷")
-    ) {
-      getThinkingAndResponse(
-        message.content[currentActiveTabNo - 1].content,
-        message.role,
-        "◁/think▷"
-      );
-    } else {
-      setActualResponse(message.content[0].content);
-    }
-  }, [message.content, message.role, currentActiveTabNo]);
+    getThinkingAndResponse({
+      content: message?.content[0]?.content || streamResponse,
+    });
+  }, [message?.content, message.role, currentActiveTabNo, streamResponse]);
 
   useEffect(() => {
     const imageUrlRegex =
@@ -116,7 +120,7 @@ const Chat = ({
               </div>
             ))}
           <div
-            className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none`}
+            className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none overflow-x-auto scrollable-container`}
           >
             {actualResponse.length > 200 ? (
               <div
@@ -166,7 +170,7 @@ const Chat = ({
             </div>
           )}
           <div
-            className={`w-full rounded-lg px-4 py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300`}
+            className={`w-full rounded-lg px-4 py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
           >
             {thinking && (
               <Collapsible defaultOpen={false} className="group/collapsible">
@@ -182,13 +186,8 @@ const Chat = ({
             {chatType === "text" ? (
               // <Markdown>{actualResponse}</Markdown>
               <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
-                rehypePlugins={[
-                  rehypeHighlight,
-                  rehypeSanitize,
-                  rehypeKatex,
-                  rehypeRaw,
-                ]}
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}
               >
                 {actualResponse}
               </ReactMarkdown>

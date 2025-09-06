@@ -1,9 +1,9 @@
 // import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 // import { api } from "../../api/api";
-import { useAuthStore, useChatStore } from "@/zustand/store";
+import { useAuthStore, useChatRoomStore } from "@/zustand/store";
 import { useEffect } from "react";
-import axiosConfig from "@/axios/axiosConfig";
+import { axiosConfig } from "@/api/axiosConfig";
 import { toast } from "react-toastify";
 import Logo from "@/components/utils/Logo";
 import { AxiosError } from "axios";
@@ -19,7 +19,7 @@ const AuthCallback = () => {
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
-  const { chatRooms } = useChatStore((store) => store);
+  const { chatRooms } = useChatRoomStore((store) => store);
 
   const { deleteChatRoom } = useDeleteData();
 

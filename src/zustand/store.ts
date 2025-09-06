@@ -1,8 +1,7 @@
-import { getAllData } from "@/indexDB/indexDB";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-const useChatStore = create<StoreState>((set) => ({
+const useChatStore = create<ChatStoreState>((set) => ({
   chatsHistory: [],
   currentChatsHistory: [],
   setChatsHistory: (chats: Chat[]) =>
@@ -43,7 +42,9 @@ const useChatStore = create<StoreState>((set) => ({
     set(() => ({
       currentChatsHistory: chats,
     })),
+}));
 
+const useChatRoomStore = create<ChatRoomStoreState>((set) => ({
   chatRooms: [],
   activeChatRoom: null,
   isChatRoomActive: false,
@@ -69,29 +70,17 @@ const useChatStore = create<StoreState>((set) => ({
       chatRooms: state.chatRooms.filter(
         (chatRoom) => chatRoom.chatRoomId !== id
       ),
-      chatsHistory: state.chatsHistory.filter((chat) => chat.chatRoomId !== id),
-      currentChatsHistory: isActiveChatRoom ? [] : state.currentChatsHistory,
+      // chatsHistory: state.chatsHistory.filter((chat) => chat.chatRoomId !== id),
+      // currentChatsHistory: isActiveChatRoom ? [] : state.currentChatsHistory,
       activeChatRoom: isActiveChatRoom ? null : state.activeChatRoom,
     })),
   setIsChatRoomsFetching: (isFetching: boolean) =>
     set(() => ({
       isChatRoomsFetching: isFetching,
     })),
+}));
 
-  isResponseLoading: false,
-  setIsResponseLoading: (isLoading: boolean) =>
-    set(() => ({
-      isResponseLoading: isLoading,
-    })),
-
-  // llm error
-  LLMResponsedError: "",
-  setLLMResponsedError: (error: string) =>
-    set(() => ({
-      LLMResponsedError: error,
-    })),
-
-  // current llm model
+const useModelStore = create<ChatModelStoreState>((set) => ({
   chatModels: [
     {
       name: "Mistral 24b",
@@ -123,6 +112,18 @@ const useChatStore = create<StoreState>((set) => ({
     id: "mistralai/mistral-small-3.1-24b-instruct:free",
     label: "free",
   },
+  isResponseLoading: false,
+  setIsResponseLoading: (isLoading: boolean) =>
+    set(() => ({
+      isResponseLoading: isLoading,
+    })),
+
+  // llm error
+  LLMResponsedError: "",
+  setLLMResponsedError: (error: string) =>
+    set(() => ({
+      LLMResponsedError: error,
+    })),
   changeCurrentLLMModel: (model: Partial<Model>) =>
     set(() => ({
       currentLLMModel: model,
@@ -136,16 +137,45 @@ const useChatStore = create<StoreState>((set) => ({
         : [...state.chatModels, model],
     })),
   setChatModels: (models: Partial<Model>[]) =>
-    set(() => {
-      getAllData({ storeName: "currentlyUsedModels" }).then((res) => {
-        console.log(res);
-      });
-      return { chatModels: models };
-    }),
+    set(() => ({ chatModels: models })),
+}));
 
-  // image file store
+const useAuthStore = create<AuthStoreState>()(
+  persist<AuthStoreState>(
+    (set) => ({
+      user: null,
+      login: (user: User | null) =>
+        set(() => ({
+          user: user,
+        })),
+      logout: () =>
+        set(() => ({
+          user: null,
+        })),
+      canUseWithoutAuth: true,
+      setCanUseWithoutAuth: (canUse: boolean) =>
+        set(() => {
+          return {
+            canUseWithoutAuth: canUse,
+          };
+        }),
+    }),
+    {
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+const useImageUploadStore = create<ImageUploadStoreState>((set) => ({
+  // image chat file store
   uploadedImgs: [],
   wantToImgUpload: false,
+  progress: 0,
+  setProgress: (progress: number) =>
+    set(() => ({
+      progress: progress,
+    })),
   setWantToImgUpload: (doesUploaded: boolean) =>
     set(() => ({
       wantToImgUpload: doesUploaded,
@@ -171,40 +201,6 @@ const useChatStore = create<StoreState>((set) => ({
       ),
     })),
 }));
-
-const useAuthStore = create<AuthStoreState>()(
-  persist<AuthStoreState>(
-    (set) => ({
-      user: null,
-      isLoggedIn: false,
-      login: (user: User | null) =>
-        set(() => {
-          return {
-            user: user,
-            isLoggedIn: true,
-          };
-        }),
-      logout: () =>
-        set(() => {
-          return {
-            user: null,
-            isLoggedIn: false,
-          };
-        }),
-      canUseWithoutAuth: true,
-      setCanUseWithoutAuth: (canUse: boolean) =>
-        set(() => {
-          return {
-            canUseWithoutAuth: canUse,
-          };
-        }),
-    }),
-    {
-      name: "auth-storage",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
 
 const useImageStore = create<ImageStoreState>((set) => ({
   imageGenerationOn: false,
@@ -245,4 +241,12 @@ const useThemeStore = create<ThemeStoreState>((set) => ({
     })),
 }));
 
-export { useChatStore, useAuthStore, useImageStore, useThemeStore };
+export {
+  useChatStore,
+  useAuthStore,
+  useImageStore,
+  useThemeStore,
+  useChatRoomStore,
+  useModelStore,
+  useImageUploadStore,
+};

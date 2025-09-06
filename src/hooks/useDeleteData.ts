@@ -10,18 +10,22 @@
  * This ensures seamless data management and synchronization across the application.
  */
 
-// import axiosConfig from "@/axios/axiosConfig";
-import axiosConfig from "@/axios/axiosConfig";
-import { deleteData } from "@/indexDB/indexDB";
-import { useAuthStore, useChatStore } from "@/zustand/store";
+import { useAuthStore, useChatRoomStore, useChatStore } from "@/zustand/store";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
+import { ChatRoomService } from "@/services/chatRoomService";
+import IndexedDBService from "@/services/indexDB/indexDBService";
+
+const chatRoom = new ChatRoomService();
+const Idb = new IndexedDBService();
 
 const useDeleteData = () => {
   const [deleting, setDeleting] = useState(false);
-  const { deleteChatRoomFromLocal, chatsHistory, setCurrentChatsHistory } =
-    useChatStore((store) => store);
+  const { chatsHistory, setCurrentChatsHistory } = useChatStore(
+    (store) => store
+  );
+  const { deleteChatRoomFromLocal } = useChatRoomStore((store) => store);
 
   const { user } = useAuthStore((store) => store);
 
@@ -35,12 +39,7 @@ const useDeleteData = () => {
     if (user) {
       try {
         // delete chat room from mongoDB
-        await axiosConfig.delete(`/chat/room/delete/${chatRoomIds[0]}`);
-        // delete chats of this chat room from mongoDB
-        const res = await axiosConfig.delete(
-          `/chat/all/delete/${chatRoomIds[0]}`
-        );
-        toast.success(res.data.deletedCount + " chats deleted successfully.");
+        await chatRoom.deleteChatRoomFromDB({ chatRoomId: chatRoomIds[0] });
       } catch (error) {
         console.error("Error deleting chat room from MongoDB:", error);
         toast.error("Error while deleting chats", {
@@ -55,13 +54,13 @@ const useDeleteData = () => {
     // delete data from indexDB
     chatRoomIds.forEach(async (chatRoomId) => {
       // delete chat room from indexDB
-      deleteData({ id: chatRoomId, storeName: "chatRoom" });
+      await Idb.deleteData({ id: chatRoomId, storeName: "chatRoom" });
       // delete chat room from mongoDB
       console.log("chat history from delete chat room hook ", chatsHistory);
       chatsHistory
         .filter((chat) => chat.chatRoomId === chatRoomId)
-        .forEach((filteredChat) => {
-          deleteData({ id: filteredChat.chatId, storeName: "chat" });
+        .forEach(async (filteredChat) => {
+          await Idb.deleteData({ id: filteredChat.chatId, storeName: "chat" });
         });
       // delete chat room from zustand store
       deleteChatRoomFromLocal(chatRoomId, param.chatRoomId === chatRoomId);

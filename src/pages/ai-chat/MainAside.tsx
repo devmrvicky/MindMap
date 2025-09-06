@@ -5,10 +5,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import ChatUI from "../../../components/chat-ui/ChatUI";
-import { ModelSwitcher } from "../../../components/ModelSwitcher";
-import SignupPageNavigationBtn from "../../../components/buttons/auth/SignupPageNavigationBtn";
-import LoginPageNavigationBtn from "../../../components/buttons/auth/LoginPageNavigationBtn";
+import ChatUI from "../../components/chat-ui/ChatUI";
+import { ModelSwitcher } from "../../components/ModelSwitcher";
+import SignupPageNavigationBtn from "../../components/buttons/auth/SignupPageNavigationBtn";
+import LoginPageNavigationBtn from "../../components/buttons/auth/LoginPageNavigationBtn";
 import { useAuthStore } from "@/zustand/store";
 
 export default function MainAside() {
@@ -25,13 +25,13 @@ export default function MainAside() {
             <ModelSwitcher />
           </div>
           <div className="ml-auto flex items-center gap-2 pr-4">
-            {user ? (
-              ""
-            ) : (
+            {!user ? (
               <>
                 <LoginPageNavigationBtn />
                 <SignupPageNavigationBtn />
               </>
+            ) : (
+              ""
             )}
           </div>
         </header>

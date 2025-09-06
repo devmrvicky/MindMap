@@ -6,7 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -15,11 +14,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useChatStore, useImageStore } from "@/zustand/store";
+import { useImageStore, useModelStore } from "@/zustand/store";
 
 export function ModelSwitcher() {
   const { chatModels, changeCurrentLLMModel, imageModels, currentLLMModel } =
-    useChatStore((state) => state);
+    useModelStore((state) => state);
   // const [models, setModels] = React.useState(() => [...chatModels]);
   const { isMobile } = useSidebar();
   // console.log(chatModels);

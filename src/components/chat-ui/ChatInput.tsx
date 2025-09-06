@@ -1,4 +1,4 @@
-import { useChatStore } from "@/zustand/store";
+import { useImageUploadStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { useState } from "react";
@@ -11,6 +11,18 @@ import { toast } from "react-toastify";
 import useWebSpeech from "@/hooks/useWebSpeech";
 import ChatInputToolsBtn from "../ChatInputToolsBtn";
 
+// import { Dispatch, SetStateAction } from "react";
+import { useParams } from "react-router";
+
+// interface ChatInputProps {
+//   setStreamResponse?: Dispatch<SetStateAction<string>>;
+//   streamResponse?: string;
+// }
+
+// interface ChatInputProps {
+//   setStreamResponse: (response: string) => string;
+// }
+
 const ChatInput = () => {
   // get all var to use mice button
   const { recognitionRef } = useWebSpeech();
@@ -18,15 +30,16 @@ const ChatInput = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { getLLMResponse } = useLLMRequest();
-  const { currentChatsHistory, uploadedImgs, wantToImgUpload } = useChatStore(
+  const { uploadedImgs, wantToImgUpload } = useImageUploadStore(
     (state) => state
   );
+  const { chatRoomId } = useParams();
 
   const isMobile = useIsMobile();
 
   const handleSendChatRequest = async (prompt: string) => {
     try {
-      await getLLMResponse(prompt, () => setDialogOpen(true));
+      await getLLMResponse(prompt);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.message);
@@ -38,10 +51,10 @@ const ChatInput = () => {
   return (
     <div
       className={`bg-white dark:bg-zinc-800 shadow-2xl border max-w-[700px] w-full rounded-2xl my-3 flex flex-col items-center justify-center p-2 ${
-        currentChatsHistory.length > 0
+        chatRoomId
           ? `sticky max-w-[500px] w-full bottom-2 bg-blend-hard-light z-50`
           : ""
-      }`}
+      } `}
     >
       {wantToImgUpload && uploadedImgs.length === 0 && (
         <div className="w-full flex items-center gap-2 mb-2 top-[0px]  overflow-x-auto relative z-0">
@@ -64,7 +77,9 @@ const ChatInput = () => {
               <img src={img.src} alt={img.name} className="w-fll h-full" />
               <button
                 className="absolute top-0 right-0 text-red-500"
-                onClick={() => useChatStore.getState().removeImg(img.name)}
+                onClick={() =>
+                  useImageUploadStore.getState().removeImg(img.name)
+                }
               >
                 &times;
               </button>

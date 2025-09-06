@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useChatStore } from "@/zustand/store";
+import { useChatRoomStore } from "@/zustand/store";
 import { useNavigate, useParams } from "react-router";
 import useDeleteData from "@/hooks/useDeleteData";
 import { useState } from "react";
@@ -24,7 +24,7 @@ import { useState } from "react";
 export function NavChatRooms() {
   const [targetChatRoomId, setTargetChatRoomId] = useState<string | null>(null);
   const { isMobile } = useSidebar();
-  const { chatRooms, isChatRoomsFetching } = useChatStore((store) => store);
+  const { chatRooms, isChatRoomsFetching } = useChatRoomStore((store) => store);
 
   const { deleteChatRoom, deleting } = useDeleteData();
 

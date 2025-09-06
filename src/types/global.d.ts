@@ -13,13 +13,7 @@ declare global {
     chatRoomId: string;
   }
 
-  // interface Model {
-  //   name: string;
-  //   model: string;
-  //   label: "free" | "paid";
-  // }
-
-  interface StoreState {
+  interface ChatStoreState {
     chatsHistory: Chat[];
     setChatsHistory: (chats: Chat[]) => void;
     addNewChat: (newChat: Chat) => void;
@@ -30,18 +24,10 @@ declare global {
     }) => void;
     currentChatsHistory: Chat[];
     setCurrentChatsHistory: (chats: Chat[]) => void;
-    isResponseLoading: boolean;
-    setIsResponseLoading: (isLoading: boolean) => void;
-    LLMResponsedError: string;
-    // partial Model type I want only id, name and label fields here not all Model type fields
-    chatModels: Partial<Model>[];
-    imageModels: Partial<Model>[];
-    setLLMResponsedError: (error: string) => void;
-    currentLLMModel: Partial<Model>;
-    changeCurrentLLMModel: (model: Partial<Model>) => void;
-    toggleChatModel: (model: Partial<Model>) => void;
-    setChatModels: (models: Partial<Model>[]) => void;
+  }
 
+  // chat room
+  interface ChatRoomStoreState {
     chatRooms: ChatRoom[];
     setChatRooms: (chatRooms: ChatRoom[]) => void;
     activeChatRoom: ActiveChatRoom;
@@ -50,6 +36,23 @@ declare global {
     deleteChatRoomFromLocal: (id: string, isActiveChatRoom: boolean) => void;
     isChatRoomsFetching: boolean;
     setIsChatRoomsFetching: (isFetching: boolean) => void;
+  }
+
+  interface ChatModelStoreState {
+    isResponseLoading: boolean;
+    LLMResponsedError: string;
+    // partial Model type I want only id, name and label fields here not all Model type fields
+    chatModels: Partial<Model>[];
+    imageModels: Partial<Model>[];
+    currentLLMModel: Partial<Model>;
+    setIsResponseLoading: (isLoading: boolean) => void;
+    setLLMResponsedError: (error: string) => void;
+    changeCurrentLLMModel: (model: Partial<Model>) => void;
+    toggleChatModel: (model: Partial<Model>) => void;
+    setChatModels: (models: Partial<Model>[]) => void;
+  }
+
+  interface ImageUploadStoreState {
     uploadedImgs: UploadedImg[];
     setUploadedImgs: (imgs: UploadedImg[]) => void;
     addImg: (img: UploadedImg) => void;
@@ -57,6 +60,8 @@ declare global {
     updateImg: (img: UploadedImg) => void;
     wantToImgUpload: boolean;
     setWantToImgUpload: (doesUploaded: boolean) => void;
+    progress: number;
+    setProgress: (progress: number) => void;
   }
 
   interface UploadedImg {
@@ -107,7 +112,6 @@ declare global {
 
   interface AuthStoreState {
     user: User | null;
-    isLoggedIn: boolean;
     login: (user: User | null) => void;
     logout: () => void;
     canUseWithoutAuth: boolean;
