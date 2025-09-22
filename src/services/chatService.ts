@@ -3,14 +3,14 @@ import IndexedDBService from "@/services/indexDB/indexDBService";
 
 const Idb = new IndexedDBService();
 
-export class ChatService {
+export default class ChatService {
   async getAllChats({ chatRoomId }: { chatRoomId: string }) {
     try {
       const res = await axiosConfig.get(`/chat/${chatRoomId}`);
       if (res.status !== 200) {
         throw new Error("Failed to fetch chats");
       }
-      return res.data.chats;
+      return res.data.data as Chat[];
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -30,7 +30,7 @@ export class ChatService {
       if (res.status !== 201) {
         throw new Error("Failed to create chat");
       }
-      return res.data.chat;
+      return res.data.data as Chat;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -42,9 +42,12 @@ export class ChatService {
       if (res.status !== 200) {
         throw new Error("unable to delete chats");
       }
-      return res.data.deletedCount;
+      return res.data.data.deletedCount;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
   }
 }
+
+// singleton instance
+export const chatService = new ChatService();

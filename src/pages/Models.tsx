@@ -12,10 +12,13 @@ import { toast } from "react-toastify";
 import ModelSortBtn from "@/components/buttons/ModelSortBtn";
 import ModelSearchInput from "@/components/ModelSearchInput";
 import { Switch } from "@/components/ui/switch";
-import { useChatStore } from "@/zustand/store";
+import { useModelStore } from "@/zustand/store";
 import GetLatestModelBtn from "@/components/buttons/GetLatestModelsBtn";
 import ModelFilterBtn from "@/components/buttons/ModelFilterBtn";
 import CopyBtn from "@/components/buttons/CopyBtn";
+import LlmService from "@/services/llmService";
+
+const llmService = new LlmService();
 
 const Models = () => {
   const [modelRefreshing, setModelRefreshing] = useState(false);
@@ -23,10 +26,23 @@ const Models = () => {
     []
   );
 
-  const { getModels, toggleChatModelIndexDB } = useModels();
+  const { toggleChatModelIndexDB } = useModels();
+
+  const getModels = async ({
+    forceRefresh = false,
+  }: {
+    forceRefresh?: boolean;
+  }) => {
+    try {
+      const models = await llmService.getAvailableModels({ forceRefresh });
+      return models;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : "Unknown error");
+    }
+  };
 
   // get model list and toggle model function
-  const { chatModels } = useChatStore((state) => state);
+  const { chatModels } = useModelStore((state) => state);
   console.log({ chatModels });
 
   // search models

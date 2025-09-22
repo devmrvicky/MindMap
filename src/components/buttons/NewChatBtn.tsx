@@ -2,17 +2,28 @@ import { PenLine } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useChatRoomStore, useChatStore } from "@/zustand/store";
 import { Button } from "../ui/button";
+import useKeyboardShortcut from "@/hooks/useKeyboardShortcut";
+import { useCallback } from "react";
 
 const NewChatBtn = () => {
   const navigate = useNavigate();
-  const { setCurrentChatsHistory } = useChatStore((store) => store);
-  const { setActiveChatRoom } = useChatRoomStore((store) => store);
+  const setCurrentChatsHistory = useChatStore(
+    (store) => store.setCurrentChatsHistory
+  );
+  const setActiveChatRoom = useChatRoomStore(
+    (store) => store.setActiveChatRoom
+  );
 
-  const handleClickOnNewChatButton = () => {
+  // Keyboard shortcut: Ctrl + /
+  useKeyboardShortcut(["ctrl", "/"], () => {
+    handleClickOnNewChatButton();
+  });
+
+  const handleClickOnNewChatButton = useCallback(() => {
+    setCurrentChatsHistory([]); // Reset the active chat room to null
     navigate("/");
     setActiveChatRoom(null);
-    setCurrentChatsHistory([]); // Reset the active chat room to null
-  };
+  }, [navigate, setActiveChatRoom, setCurrentChatsHistory]);
 
   return (
     <Button

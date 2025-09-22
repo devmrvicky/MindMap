@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "katex/dist/katex.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -120,23 +121,9 @@
 }
 
 .scrollable-container::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
   /* width: 8px; */
 }
-
-/* ::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #555;
-}
-
-.scrollable-container {
-  scrollbar-width: thin;
-  scrollbar-color: #888 #f1f1f1;
-} */
 
 .scroll-down {
   scroll-behavior: smooth;
@@ -148,4 +135,58 @@
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+/* Reset KaTeX inside prose */
+.prose .katex {
+  font-size: 1.1em !important;
+  line-height: 1.5 !important;
+  color: inherit !important; /* respect dark/light theme */
+}
+
+/* Block equations (display mode) */
+.prose .katex-display {
+  display: block;
+  margin: 1.25em 0;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.prose .katex-display > .katex {
+  display: inline-block;
+  text-align: initial;
+}
+
+html.dark .katex {
+  color: #fff !important; /* or a neutral gray if you prefer */
+}
+
+/* custom scrollbar */
+/* For WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }

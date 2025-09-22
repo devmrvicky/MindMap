@@ -1,7 +1,7 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { axiosConfig } from "@/api/axiosConfig";
-import IndexedDBService from "@/services/indexDB/indexDBService";
+import { Idb } from "@/services/indexDB/indexDBService"; // export singleton
 import {
   useChatStore,
   useAuthStore,
@@ -9,57 +9,52 @@ import {
 } from "@/zustand/store.ts";
 import { AxiosError } from "axios";
 
-const Idb = new IndexedDBService();
-
 export function useChatRoomInit() {
-  const { setChatsHistory } = useChatStore((store) => store);
-  const { setChatRooms, setIsChatRoomsFetching } = useChatRoomStore(
-    (store) => store
+  const setChatsHistory = useChatStore((s) => s.setChatsHistory);
+  const setChatRooms = useChatRoomStore((s) => s.setChatRooms);
+  const setIsChatRoomsFetching = useChatRoomStore(
+    (s) => s.setIsChatRoomsFetching
   );
-  const { user } = useAuthStore((store) => store);
-
-  const loadChatData = useCallback(async () => {
-    try {
-      setIsChatRoomsFetching(true);
-      let chatRooms: ChatRoom[] = [];
-      // let chats: Chat[] = [];
-
-      if (!user) {
-        // fetch from indexDB if user not logged in
-        // const [rooms, history] = await Promise.all([
-        //   getAllData({ storeName: "chatRoom" }),
-        //   getAllData({ storeName: "chat" }),
-        // ]);
-        const rooms = await Idb.getAllData({ storeName: "chatRoom" });
-        chatRooms = rooms as ChatRoom[];
-        // chats = history as Chat[];
-      } else {
-        // clear indexDB and fetch from server
-        await Promise.all([Idb.clearStore("chatRoom"), Idb.clearStore("chat")]);
-        const { data } = await axiosConfig.get("/chat/room");
-        chatRooms = data.chatRooms;
-        Idb.setAllData({ data: chatRooms, storeName: "chatRoom" });
-      }
-
-      setChatRooms(chatRooms);
-      // setChatsHistory(chats);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data.message || "Failed to fetch chat data",
-          {
-            toastId: "chat-fetch-error",
-          }
-        );
-      } else {
-        console.error("Unexpected chat fetch error:", error);
-      }
-    } finally {
-      setIsChatRoomsFetching(false);
-    }
-  }, [user, setChatRooms, setChatsHistory, setIsChatRoomsFetching]);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
+    const loadChatData = async () => {
+      try {
+        setIsChatRoomsFetching(true);
+        let chatRooms: ChatRoom[] = [];
+
+        if (!user) {
+          // fetch from indexDB if user not logged in
+          const rooms = await Idb.getAllData({ storeName: "chatRoom" });
+          chatRooms = rooms as ChatRoom[];
+        } else {
+          // clear indexDB and fetch from server
+          await Promise.all([
+            Idb.clearStore("chatRoom"),
+            Idb.clearStore("chat"),
+          ]);
+          const res = await axiosConfig.get("/chatroom");
+          chatRooms = res.data.data;
+          await Idb.setAllData({ data: chatRooms, storeName: "chatRoom" });
+        }
+
+        setChatRooms(chatRooms);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast.error(
+            error.response?.data.message || "Failed to fetch chat data",
+            {
+              toastId: "chat-fetch-error",
+            }
+          );
+        } else {
+          console.error("Unexpected chat fetch error:", error);
+        }
+      } finally {
+        setIsChatRoomsFetching(false);
+      }
+    };
+
     loadChatData();
-  }, [loadChatData]);
+  }, [user, setChatRooms, setIsChatRoomsFetching, setChatsHistory]);
 }

@@ -6,12 +6,14 @@ import FileUploadBtn from "./buttons/FileUploadBtn";
 
 const ChatInputToolsBtn = ({
   setPrompt,
+  setWantToImgUpload,
 }: {
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
+  setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <div className="flex items-center justify-center gap-1">
-      <FileUploadBtn />
+      <FileUploadBtn setWantToImgUpload={setWantToImgUpload} />
       {/* internet button */}
       <Button
         variant="outline"

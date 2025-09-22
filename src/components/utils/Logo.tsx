@@ -3,7 +3,7 @@ import lightLogoPng from "@/assets/light-mind-map.png";
 import logoGif from "@/assets/mind-map.gif";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useChatStore, useThemeStore } from "@/zustand/store";
+import { useChatRoomStore, useChatStore, useThemeStore } from "@/zustand/store";
 
 const Logo = ({
   isIconSpin,
@@ -17,11 +17,14 @@ const Logo = ({
     isIconSpin ? logoGif : logoPng
   );
   const navigate = useNavigate();
-  const { setActiveChatRoom, setCurrentChatsHistory } = useChatStore(
-    (store) => store
+  const setActiveChatRoom = useChatRoomStore(
+    (store) => store.setActiveChatRoom
+  );
+  const setCurrentChatsHistory = useChatStore(
+    (store) => store.setCurrentChatsHistory
   );
 
-  const { isDarkMode } = useThemeStore((store) => store);
+  const isDarkMode = useThemeStore((store) => store.isDarkMode);
 
   useEffect(() => {
     if (isDarkMode) {

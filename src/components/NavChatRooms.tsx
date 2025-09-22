@@ -14,17 +14,23 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useChatRoomStore } from "@/zustand/store";
 import { useNavigate, useParams } from "react-router";
 import useDeleteData from "@/hooks/useDeleteData";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export function NavChatRooms() {
   const [targetChatRoomId, setTargetChatRoomId] = useState<string | null>(null);
+
+  const sidebarRef = useRef<HTMLButtonElement | null>(null);
+
   const { isMobile } = useSidebar();
-  const { chatRooms, isChatRoomsFetching } = useChatRoomStore((store) => store);
+  // const { chatRooms, isChatRoomsFetching } = useChatRoomStore((store) => store);
+  const chatRooms = useChatRoomStore((s) => s.chatRooms);
+  const isChatRoomsFetching = useChatRoomStore((s) => s.isChatRoomsFetching);
 
   const { deleteChatRoom, deleting } = useDeleteData();
 
@@ -32,6 +38,9 @@ export function NavChatRooms() {
   const { chatRoomId } = useParams();
 
   const handleClickOnChatRoom = (id: string) => {
+    if (isMobile && sidebarRef.current) {
+      sidebarRef.current.click();
+    }
     navigate(`/c/${id}`);
   };
 
@@ -47,20 +56,24 @@ export function NavChatRooms() {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       {/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
+      <SidebarTrigger className="-ml-1 hidden" ref={sidebarRef} />
       <SidebarMenu>
         {!isChatRoomsFetching
           ? chatRooms.length
             ? chatRooms.map((chatRoom) => (
                 <SidebarMenuItem
                   key={chatRoom.chatRoomId}
-                  onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
                   className={`cursor-pointer flex items-center gap-2 ${
                     chatRoomId === chatRoom.chatRoomId
                       ? "bg-sidebar-accent"
                       : ""
                   }`}
                 >
-                  <SidebarMenuButton asChild className="w-[85%]">
+                  <SidebarMenuButton
+                    asChild
+                    className="w-[85%]"
+                    onClick={() => handleClickOnChatRoom(chatRoom.chatRoomId)}
+                  >
                     <span className="truncate" title={chatRoom.chatRoomName}>
                       {chatRoom.chatRoomName}
                     </span>

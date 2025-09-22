@@ -3,8 +3,9 @@ import { useModelStore } from "@/zustand/store";
 import { Dispatch, SetStateAction } from "react";
 
 const useStreamResponse = () => {
-  const { currentLLMModel, setIsResponseLoading } = useModelStore(
-    (state) => state
+  const currentLLMModel = useModelStore((state) => state.currentLLMModel);
+  const setIsResponseLoading = useModelStore(
+    (state) => state.setIsResponseLoading
   );
 
   const getStreamedResponse = async ({
@@ -19,7 +20,9 @@ const useStreamResponse = () => {
     console.log("streaming response...");
     if (!prompt) return "PENDING";
     const eventSource = new EventSource(
-      `${env.SERVER_ENDPOINT}/chat/stream-generate?message=${encodeURIComponent(
+      `${
+        env.VITE_SERVER_ENDPOINT
+      }/chat/stream-generate?message=${encodeURIComponent(
         prompt
       )}&model=${currentLLMModel}`
     );

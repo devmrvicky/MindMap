@@ -1,12 +1,11 @@
-import IndexedDBService from "@/services/indexDB/indexDBService";
+import { Idb } from "@/services/indexDB/indexDBService";
 import { axiosConfig, openrouterAxiosConfig } from "../api/axiosConfig";
-
-const Idb = new IndexedDBService();
 
 type GetChatLlmResponseProps = {
   prompt: string;
   model: string;
   fileUrls?: string[];
+  prevResponses?: string;
 };
 
 interface GetModelsPropType {
@@ -49,19 +48,22 @@ export default class LlmService {
     prompt,
     model,
     fileUrls,
+    prevResponses,
   }: GetChatLlmResponseProps) {
     try {
-      const res = await axiosConfig.post("/chat/generate", {
+      // console.log(prevResponses);
+      const res = await axiosConfig.post("/llm/text/generate", {
         prompt,
         model,
         fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
+        prevResponses,
       });
 
       if (res.status !== 200) {
         throw new Error("Failed to get LLM response");
       }
 
-      return res.data.response;
+      return res.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -70,7 +72,7 @@ export default class LlmService {
   // ✅ Get image response
   async getImageResponse({ prompt, model }: { prompt: string; model: string }) {
     try {
-      const res = await axiosConfig.post("/chat/image/generate", {
+      const res = await axiosConfig.post("/llm/image/generate", {
         prompt,
         model,
       });
@@ -79,9 +81,11 @@ export default class LlmService {
         throw new Error("Failed to get LLM image response");
       }
 
-      return res.data;
+      return res.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
   }
 }
+
+export const llmService = new LlmService();

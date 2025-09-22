@@ -107,14 +107,15 @@ export class ImageKitService {
   }
 
   static async delete(fileId: string) {
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/delete-image/${fileId}`,
-      {
-        method: "DELETE",
+    try {
+      const response = await axiosConfig.delete(`/imagekit/delete/${fileId}`);
+      if (response.status !== 200) {
+        throw new Error("Failed to delete file");
       }
-    );
-    if (!res.ok) throw new Error("Failed to delete image");
-    return await res.json();
+      return response.data.data;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : "Unknown error");
+    }
   }
 }
 

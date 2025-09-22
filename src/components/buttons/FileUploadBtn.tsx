@@ -4,9 +4,14 @@ import { useImageUploadStore } from "@/zustand/store";
 import { useRef } from "react";
 import { handleUpload } from "@/handlers/handleUpload";
 
-const FileUploadBtn = () => {
-  const { addImg, setWantToImgUpload, updateImg, setProgress } =
-    useImageUploadStore((store) => store);
+const FileUploadBtn = ({setWantToImgUpload}: {setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>}) => {
+  const addImg =
+    useImageUploadStore((store) => store.addImg);
+  const updateImg =
+    useImageUploadStore((store) => store.updateImg);
+  const setProgress =
+    useImageUploadStore((store) => store.setProgress);
+
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
 

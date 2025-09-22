@@ -38,7 +38,7 @@ const AuthCallback = () => {
           { withCredentials: true }
         );
 
-        const { message, user } = res.data;
+        const { message, user } = res.data.data;
         if (!user) {
           console.log("Login failed! user did not get.");
           toast.error("Login failed! user did not get.");

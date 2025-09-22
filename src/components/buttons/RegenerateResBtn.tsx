@@ -18,7 +18,6 @@ const RegenerateResBtn = ({
   errorRes?: boolean;
   model?: string;
 }) => {
-  const { currentLLMModel } = useModelStore((state) => state);
   const handleRegenerate = () => {
     toast.warn(
       "This feature is under development, please wait for the next update.",
@@ -30,48 +29,6 @@ const RegenerateResBtn = ({
     return;
   };
 
-  // const { getLLMRegeneratedResponse, getLLMResponse } = useLLMRequest();
-
-  // const handleRegenerate = (changedModel?: Partial<Model>) => {
-  //   toast.info(
-  //     "this feature is under development, please wait for the next update",
-  //     {
-  //       toastId: "regenerate-res-btn",
-  //     }
-  //   );
-  //   return;
-  //   if (changedModel) setCurrentUsedModel(changedModel);
-  //   const indexOfResThatRegenerate = !errorRes
-  //     ? currentChatsHistory.findIndex((chat) => chat.chatId === chatId)
-  //     : currentChatsHistory.length - 1;
-  //   if (indexOfResThatRegenerate === -1) {
-  //     console.error("Response ID not found in chat history");
-  //     return;
-  //   }
-  //   const query = errorRes
-  //     ? currentChatsHistory[indexOfResThatRegenerate].content[0].content
-  //     : currentChatsHistory[indexOfResThatRegenerate - 1].content[0].content;
-  //   if (!errorRes) {
-  //     // console.log(currentChatsHistory.slice(0, indexOfResThatRegenerate - 1));
-  //     // return;
-  //     getLLMRegeneratedResponse({
-  //       chatId: chatId || "",
-  //       query,
-  //       model: " changedModel.id || currentUsedModel.id || currentLLMModel.id",
-  //       prevResponse: currentChatsHistory
-  //         .slice(0, indexOfResThatRegenerate - 1)
-  //         .slice(-5),
-  //     });
-  //   } else {
-  //     getLLMResponse(query);
-  //   }
-  //   console.log(
-  //     `Regenerating response for query: ${query} with model: ${
-  //       changedModel || currentUsedModel
-  //     }`
-  //   );
-  // };
-
   return (
     <div className="flex items-center justify-center border rounded-2xl max-w-fit">
       <Button
@@ -82,10 +39,7 @@ const RegenerateResBtn = ({
       >
         <RefreshCcw size={20} />
       </Button>
-      <ChooseModel
-        model={currentLLMModel}
-        handleRegenerate={handleRegenerate}
-      />
+      <ChooseModel model={model} handleRegenerate={handleRegenerate} />
     </div>
   );
 };
@@ -94,10 +48,10 @@ const ChooseModel = ({
   model,
   handleRegenerate,
 }: {
-  model: Partial<Model>;
+  model?: string;
   handleRegenerate: (changedModel?: Partial<Model>) => void;
 }) => {
-  const { chatModels } = useModelStore((state) => state);
+  const chatModels = useModelStore((state) => state.chatModels);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="btn btn-secondary btn-sm">
@@ -107,8 +61,8 @@ const ChooseModel = ({
           title="change model"
         >
           <span>
-            {chatModels.find((chatModel) => chatModel.id === model.id)?.name ??
-              "Unknown Model"}
+            {chatModels.find((chatModel) => chatModel.id === model)?.name ??
+              model}
           </span>
           <ChevronDown size={20} />
         </Button>
@@ -117,7 +71,7 @@ const ChooseModel = ({
         {chatModels.map((chatModel) => (
           <DropdownMenuItem
             key={chatModel.name}
-            defaultChecked={chatModel.id === model.id}
+            defaultChecked={chatModel.id === model}
             onClick={() => {
               // changeCurrentLLMModel(chatModel.model);
               handleRegenerate(chatModel);

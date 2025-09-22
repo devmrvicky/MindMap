@@ -3,45 +3,42 @@ import GreetingMessageComp from "../GreetingMessage";
 import ChatContainer from "./ChatContainer";
 import ChatInput from "./ChatInput";
 import { useChatStore } from "@/zustand/store";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useChatInit } from "@/hooks/useChatInit";
+import ChatSkeleton from "./ChatSketeton";
+import { useParams } from "react-router";
 
 const ChatUI = () => {
-  // stream response (we are declairing stream response here because chat ui is paret component of chat input and chat container, so we can pass stream response to both component if needed)
-  const [streamResponse] = useState("");
-
-  const { currentChatsHistory, setCurrentChatsHistory } = useChatStore(
-    (state) => state
-  );
+  const currentChatsHistory = useChatStore((s) => s.currentChatsHistory);
+  const setCurrentChatsHistory = useChatStore((s) => s.setCurrentChatsHistory);
 
   const isMobile = useIsMobile();
+  const { chatRoomId } = useParams<{ chatRoomId: string }>();
 
   useChatInit({ setCurrentChatsHistory });
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // const { isScrollDown, isScrollUp } = useScrollDetection(chatContainerRef);
-
-  // console.log({ isScrollDown, isScrollUp });
-
   return (
-    <div
-      className="bg-white dark:bg-black w-full h-full chat-container"
-      // ref={chatContainerRef}
-    >
+    <div className="bg-white dark:bg-black w-full h-full chat-container">
       <div
-        className={`max-w-[900px] mx-auto p-4 h-full flex items-center  flex-col ${
-          isMobile ? "pb-0 justify-end" : "justify-center"
-        } ${currentChatsHistory.length > 0 ? "justify-end items-center" : ""} `}
+        className={`max-w-[900px] mx-auto w-full p-4 h-full flex flex-col relative items-center ${
+          isMobile
+            ? `pb-0 ${chatRoomId ? "justify-between" : "justify-end"}`
+            : `${chatRoomId ? "justify-between" : "justify-center"}`
+        }`}
         ref={chatContainerRef}
       >
-        {!currentChatsHistory.length && <GreetingMessageComp />}
+        {!chatRoomId && <GreetingMessageComp />}
 
-        {!currentChatsHistory.length || (
-          <ChatContainer streamResponse={streamResponse ?? ""} />
-        )}
+        {chatRoomId &&
+          (currentChatsHistory.length > 0 ? (
+            <ChatContainer streamResponse="" />
+          ) : (
+            <ChatSkeleton />
+          ))}
 
-        {/* chat input */}
+        {/* Chat input */}
         <ChatInput />
       </div>
     </div>

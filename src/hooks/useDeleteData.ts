@@ -14,32 +14,42 @@ import { useAuthStore, useChatRoomStore, useChatStore } from "@/zustand/store";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
-import { ChatRoomService } from "@/services/chatRoomService";
-import IndexedDBService from "@/services/indexDB/indexDBService";
-
-const chatRoom = new ChatRoomService();
-const Idb = new IndexedDBService();
+import { chatRoomService } from "@/services/chatRoomService";
+import { Idb } from "@/services/indexDB/indexDBService";
 
 const useDeleteData = () => {
   const [deleting, setDeleting] = useState(false);
-  const { chatsHistory, setCurrentChatsHistory } = useChatStore(
-    (store) => store
+  const currentChatsHistory = useChatStore(
+    (store) => store.currentChatsHistory
   );
-  const { deleteChatRoomFromLocal } = useChatRoomStore((store) => store);
+  const setCurrentChatsHistory = useChatStore(
+    (store) => store.setCurrentChatsHistory
+  );
+  const deleteChatRoomFromLocal = useChatRoomStore(
+    (store) => store.deleteChatRoomFromLocal
+  );
 
-  const { user } = useAuthStore((store) => store);
+  const user = useAuthStore((store) => store.user);
 
-  const param = useParams();
+  const { chatRoomId } = useParams();
 
   const navigate = useNavigate();
 
-  const deleteChatRoom = async ({ chatRoomIds }: { chatRoomIds: string[] }) => {
+  const deleteChatRoom = async ({
+    chatRoomIds,
+    isLoggingOut,
+  }: {
+    chatRoomIds: string[];
+    isLoggingOut?: boolean;
+  }) => {
     // if user is logged in then delete chat room from mongoDB first then delete it from indexDB
     setDeleting(true);
-    if (user) {
+    if (user && !isLoggingOut && chatRoomIds.length === 1) {
       try {
         // delete chat room from mongoDB
-        await chatRoom.deleteChatRoomFromDB({ chatRoomId: chatRoomIds[0] });
+        await chatRoomService.deleteChatRoomFromDB({
+          chatRoomId: chatRoomIds[0],
+        });
       } catch (error) {
         console.error("Error deleting chat room from MongoDB:", error);
         toast.error("Error while deleting chats", {
@@ -50,27 +60,29 @@ const useDeleteData = () => {
         setDeleting(false);
       }
     }
-    // await axiosConfig.delete("/")
-    // delete data from indexDB
-    chatRoomIds.forEach(async (chatRoomId) => {
-      // delete chat room from indexDB
-      await Idb.deleteData({ id: chatRoomId, storeName: "chatRoom" });
-      // delete chat room from mongoDB
-      console.log("chat history from delete chat room hook ", chatsHistory);
-      chatsHistory
-        .filter((chat) => chat.chatRoomId === chatRoomId)
-        .forEach(async (filteredChat) => {
-          await Idb.deleteData({ id: filteredChat.chatId, storeName: "chat" });
+
+    try {
+      const deletePromises = chatRoomIds.map(async (roomId) => {
+        await Idb.deleteData({ id: roomId, storeName: "chatRoom" });
+        currentChatsHistory.forEach(async (chat) => {
+          await Idb.deleteData({ id: chat.chatId, storeName: "chat" });
         });
-      // delete chat room from zustand store
-      deleteChatRoomFromLocal(chatRoomId, param.chatRoomId === chatRoomId);
-      if (param.chatRoomId === chatRoomId) {
-        console.log("it matched.");
-        navigate("/");
-        setCurrentChatsHistory([]);
-      }
-    });
-    setDeleting(false);
+        deleteChatRoomFromLocal(roomId, roomId === chatRoomId);
+        if (roomId === chatRoomId) {
+          navigate("/");
+          setCurrentChatsHistory([]);
+        }
+      });
+
+      await Promise.all(deletePromises);
+    } catch (error) {
+      console.error("Error deleting chat room:", error);
+      toast.error("Error while deleting chats", {
+        toastId: "chatroom-delete-error",
+      });
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return { deleteChatRoom, deleting };

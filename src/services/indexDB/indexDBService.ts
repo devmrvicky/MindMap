@@ -181,3 +181,6 @@ export default class IndexedDBService {
     });
   }
 }
+
+// singleton instance
+export const Idb = new IndexedDBService();

@@ -1,29 +1,19 @@
 import { useChatRoomStore } from "@/zustand/store.ts";
 import { ToastContainer } from "react-toastify";
 import { Outlet } from "react-router";
-import { useAuthInit } from "./hooks/useAuth.ts";
-import { useChatRoomInit } from "./hooks/useChatRoomInit.ts";
-import { useThemeInit } from "./hooks/useTheme.ts";
-import { useModelsInit } from "./hooks/useModelsInit.ts";
+import { useEffect } from "react";
+import { useAppInit } from "./hooks/useAppInit";
 
 function App() {
-  const { activeChatRoom } = useChatRoomStore((store) => store);
+  const chatRoomName = useChatRoomStore((s) => s.activeChatRoom?.chatRoomName);
 
-  // init auth
-  useAuthInit();
-  // init chat data
-  useChatRoomInit();
-  // init theme
-  useThemeInit();
-  // init models
-  useModelsInit();
+  // initialize everything in one place
+  useAppInit();
 
-  // title will change according to active chat room
-  if (activeChatRoom) {
-    document.title = activeChatRoom.chatRoomName;
-  } else {
-    document.title = "Mind Map";
-  }
+  // update document title only when chatRoomName changes
+  useEffect(() => {
+    document.title = chatRoomName || "Mind Map";
+  }, [chatRoomName]);
 
   return (
     <div className="app-container">

@@ -1,23 +1,10 @@
-import IndexedDBService from "@/services/indexDB/indexDBService";
+import { Idb } from "@/services/indexDB/indexDBService";
 import { useModelStore } from "@/zustand/store";
-
-/**
- * useModels is a hook which is responsible for managing the models (e.g. llm, openrouter etc.) in the application.
- * It has two functions, getModels and toggleChatModelIndexDB.
- *
- * getModels is a function which returns all models from indexDB if not found then fetch from openrouter and store it in indexDB.
- *
- * toggleChatModelIndexDB is a function which adds and removes currently used models in indexDB.
- *
- * @returns {Object} - an object with two functions, getModels and toggleChatModelIndexDB.
- */
-
-const Idb = new IndexedDBService();
 
 const useModels = (): {
   toggleChatModelIndexDB: (model: Partial<Model>) => Promise<void>;
 } => {
-  const { toggleChatModel } = useModelStore((store) => store);
+  const toggleChatModel = useModelStore((store) => store.toggleChatModel);
 
   // add and remove currently used models in indexDB
   const toggleChatModelIndexDB = async (model: Partial<Model>) => {

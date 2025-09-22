@@ -29,9 +29,7 @@ const ChatContainer = ({ streamResponse }: { streamResponse: string }) => {
   }, [currentChatsHistory.length]);
 
   return (
-    <div
-      className={`flex flex-col gap-4 w-full h-screen overflow-auto scrollable-container `}
-    >
+    <div className={`flex flex-col gap-4 w-full h-full`}>
       {currentChatsHistory.map((message, index) => (
         <Chat
           key={message.chatId}

@@ -8,11 +8,8 @@ import {
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { v1 as uuidv1 } from "uuid";
-import { ChatRoomService } from "@/services/chatRoomService";
-import { ChatService } from "@/services/chatService";
-
-const chatRoom = new ChatRoomService();
-const chat = new ChatService();
+import { chatRoomService } from "@/services/chatRoomService";
+import { chatService } from "@/services/chatService";
 
 interface createChatRoomProps {
   activeChatRoomId: ChatRoom["chatRoomId"];
@@ -24,17 +21,22 @@ interface createChatProps {
   fileUrls?: string[]; // array of file URLs
   content: string;
   role: "user" | "assistant";
+  model?: string;
 }
 
 // this hook will be responsible for creating all data withing my app. like "Chat rooms", "Chats". this hook will create data on local indexDB and on mongoDB and also responsible for update zustand store to see changes in chat ui
 const useCreateData = () => {
-  const { addNewChat } = useChatStore((store) => store);
-  const { createNewChatRoomOnLocal, chatRooms } = useChatRoomStore(
-    (store) => store
+  const addNewChat = useChatStore((store) => store.addNewChat);
+  const createNewChatRoomOnLocal = useChatRoomStore(
+    (store) => store.createNewChatRoomOnLocal
   );
-  const { currentLLMModel } = useModelStore((store) => store);
+  const chatRooms = useChatRoomStore((store) => store.chatRooms);
+  const currentLLMModel = useModelStore((store) => store.currentLLMModel);
+  const setIsResponseLoading = useModelStore(
+    (store) => store.setIsResponseLoading
+  );
 
-  const { user } = useAuthStore((store) => store);
+  const user = useAuthStore((store) => store.user);
 
   // create chat rooms
   const createChatRoom = async ({
@@ -60,7 +62,7 @@ const useCreateData = () => {
       // update zustand chat room store
       createNewChatRoomOnLocal(newChatRoom);
       // create new chat room in indexDB and mongoDB
-      await chatRoom.createChatRoomInDB({ newChatRoom, user });
+      await chatRoomService.createChatRoomInDB({ newChatRoom, user });
     } catch (error) {
       toast.error(
         error instanceof AxiosError
@@ -78,6 +80,7 @@ const useCreateData = () => {
     fileUrls,
     content,
     role,
+    model,
   }: createChatProps) => {
     try {
       const newChat: Chat = {
@@ -88,7 +91,7 @@ const useCreateData = () => {
             fileUrls,
             content,
             type: "text",
-            model: currentLLMModel.id!,
+            model: model ? model : currentLLMModel.id!,
           },
         ],
         chatRoomId: activeChatRoomId,
@@ -97,9 +100,15 @@ const useCreateData = () => {
       // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
       addNewChat(newChat);
 
+      // set the response loading state to true
+      setIsResponseLoading(true);
+
       // create chat in mongoDB(condition: when user logged in means if user has value)
-      await chat.createChat({ chat: newChat, user });
+      await chatService.createChat({ chat: newChat, user });
     } catch (error) {
+      // set the response loading state to false
+      setIsResponseLoading(false);
+
       toast.error(
         error instanceof AxiosError
           ? error.response?.data.message

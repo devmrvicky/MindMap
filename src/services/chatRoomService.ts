@@ -1,19 +1,16 @@
 import { axiosConfig } from "@/api/axiosConfig";
-import IndexedDBService from "./indexDB/indexDBService";
-import { ChatService } from "./chatService";
+import { Idb } from "./indexDB/indexDBService";
+import { chatService } from "./chatService";
 import { toast } from "react-toastify";
 
-const Idb = new IndexedDBService();
-const chatService = new ChatService();
-
-export class ChatRoomService {
+export default class ChatRoomService {
   async getChatRoomsFromDB() {
     try {
-      const res = await axiosConfig.get("/chat/room");
+      const res = await axiosConfig.get("/chatroom");
       if (res.status !== 200) {
         throw new Error("Failed to fetch chat rooms");
       }
-      return res.data.chatRooms;
+      return res.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -29,11 +26,11 @@ export class ChatRoomService {
     try {
       await Idb.updateData({ storeName: "chatRoom", data: newChatRoom });
       if (!user) return;
-      const res = await axiosConfig.post("/chat/room/create", newChatRoom);
+      const res = await axiosConfig.post("/chatroom/create", newChatRoom);
       if (res.status !== 201) {
         throw new Error("Failed to create new chat room");
       }
-      return res.data.chatRoom;
+      return res.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -46,16 +43,18 @@ export class ChatRoomService {
   }) {
     try {
       const [chatRoomDeleteRes, totalDeletedChats] = await Promise.all([
-        axiosConfig.delete(`/chat/room/delete/${chatRoomId}`),
+        axiosConfig.delete(`/chatroom/delete/${chatRoomId}`),
         chatService.deleteChat(chatRoomId),
       ]);
       if (chatRoomDeleteRes.status !== 200 && totalDeletedChats) {
         throw new Error("Failed to delete chat room");
       }
       toast.success(totalDeletedChats + " chats deleted successfully.");
-      return chatRoomDeleteRes.data.deletedChatRoom;
+      return chatRoomDeleteRes.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
   }
 }
+
+export const chatRoomService = new ChatRoomService();

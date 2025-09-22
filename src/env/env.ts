@@ -9,6 +9,7 @@ export const EnvSchema = z.object({
     .url()
     .default("https://openrouter.ai/api/v1"),
   VITE_SERVER_ENDPOINT: z.string(),
+  VITE_APP_NAME: z.string(),
 });
 
 /**

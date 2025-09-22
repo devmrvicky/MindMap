@@ -14,7 +14,7 @@ import { useAuthStore } from "@/zustand/store";
 import { NavUser } from "./NavUser";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useAuthStore((store) => store);
+  const user = useAuthStore((s) => s.user);
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>

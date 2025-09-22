@@ -5,10 +5,8 @@ import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import ChatActionsBtns from "../ChatActionsBtns";
 import ImgPopup from "../utils/ImgPopup";
 import { Button } from "../ui/button";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
 import "katex/dist/katex.css";
+import MarkdownRender from "../MarkdownRender";
 
 const Chat = ({
   message,
@@ -119,31 +117,24 @@ const Chat = ({
                 />
               </div>
             ))}
-          <div
+          {/* <div
             className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none overflow-x-auto scrollable-container`}
           >
-            {actualResponse.length > 200 ? (
-              <div
-                className="cursor-pointer"
-                onClick={() => setIsTruncated(!isTruncated)}
-              >
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
-                >
-                  {isTruncated
+          </div> */}
+          <div
+            className="cursor-pointer w-full flex justify-end mb-4"
+            onClick={() => setIsTruncated(!isTruncated)}
+          >
+            <MarkdownRender
+              content={
+                actualResponse.length > 200
+                  ? isTruncated
                     ? actualResponse
-                    : actualResponse.slice(0, 200) + "..."}
-                </ReactMarkdown>
-              </div>
-            ) : (
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
-              >
-                {actualResponse}
-              </ReactMarkdown>
-            )}
+                    : actualResponse.slice(0, 200) + "..."
+                  : actualResponse
+              }
+              isUser={true}
+            />
           </div>
         </>
       ) : (
@@ -184,13 +175,7 @@ const Chat = ({
               </Collapsible>
             )}
             {chatType === "text" ? (
-              // <Markdown>{actualResponse}</Markdown>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
-              >
-                {actualResponse}
-              </ReactMarkdown>
+              <MarkdownRender content={actualResponse} />
             ) : (
               // <HTML actualResponse={actualResponse} />
               // in case of image response actualResponse will be the image URL

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { axiosConfig } from "@/api/axiosConfig";
 import { useAuthStore, useChatRoomStore } from "@/zustand/store";
 import { AxiosError } from "axios";
@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import useDeleteData from "./useDeleteData";
 
 const useAuth = () => {
-  const { chatRooms } = useChatRoomStore((store) => store);
-  const { logout } = useAuthStore((store) => store);
+  const chatRooms = useChatRoomStore((s) => s.chatRooms);
+  const logout = useAuthStore((s) => s.logout);
 
   // import delete data function from useDeleteData hook
   const { deleteChatRoom } = useDeleteData();
@@ -17,7 +17,7 @@ const useAuth = () => {
     try {
       const res = await axiosConfig.get("/auth/google/redirect");
       // Redirect the user to the Google OAuth2 URL
-      window.location.href = res.data.OAuth2Url;
+      window.location.href = res.data.data.url;
       // navigate(res.data.OAuth2Url);
       // * after this step please check out /pages/AuthCallback.tsx page
     } catch (error) {
@@ -33,15 +33,18 @@ const useAuth = () => {
   // logout user and delete all data from indexDB
   const logoutAuth = async () => {
     try {
-      await axiosConfig.post("/user/logout");
+      // first delete all data  and then logout from server
+      await Promise.all([
+        await deleteChatRoom({
+          chatRoomIds: chatRooms.map((chatRoom) => chatRoom.chatRoomId),
+          isLoggingOut: true,
+        }),
+        await axiosConfig.post("/user/logout"),
+      ]);
       // logout from client store
       logout();
       toast.success("User logout successfully!", {
         toastId: "logout successfully",
-      });
-      // delete all data from indexDB
-      await deleteChatRoom({
-        chatRoomIds: chatRooms.map((chatRoom) => chatRoom.chatRoomId),
       });
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -65,20 +68,22 @@ const useAuth = () => {
 };
 
 export const useAuthInit = () => {
-  const { login, logout } = useAuthStore((store) => store);
-  const checkUserSession = useCallback(async () => {
-    try {
-      const { data } = await axiosConfig.get("/user");
-      data?.user ? login(data.user) : logout();
-    } catch (error) {
-      logout();
-      console.error("User session check failed:", error);
-    }
-  }, [login, logout]);
+  const login = useAuthStore((s) => s.login);
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const res = await axiosConfig.get("/user");
+        res.data?.data ? login(res.data.data) : logout();
+      } catch (error) {
+        logout();
+        console.error("User session check failed:", error);
+      }
+    };
+
     checkUserSession();
-  }, [checkUserSession]);
+  }, [login, logout]);
 };
 
 export default useAuth;

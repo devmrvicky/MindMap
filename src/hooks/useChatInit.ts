@@ -1,41 +1,43 @@
-import { ChatService } from "@/services/chatService";
-import IndexedDBService from "@/services/indexDB/indexDBService";
-import { useAuthStore } from "@/zustand/store";
+import { chatService } from "@/services/chatService";
+import { Idb } from "@/services/indexDB/indexDBService";
+import { useAuthStore, useModelStore } from "@/zustand/store";
 import { useEffect, useCallback } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { toast } from "react-toastify";
-
-const chatService = new ChatService();
-const Idb = new IndexedDBService();
 
 export const useChatInit = ({
   setCurrentChatsHistory,
 }: {
   setCurrentChatsHistory: ChatStoreState["setCurrentChatsHistory"];
 }) => {
-  const { user } = useAuthStore((store) => store);
-  const params = useParams();
+  const user = useAuthStore((s) => s.user);
+  const isResponseLoading = useModelStore((state) => state.isResponseLoading);
+  const { chatRoomId } = useParams();
+  const navigate = useNavigate();
 
   const getChatData = useCallback(async () => {
+    if (isResponseLoading) return; // prevent chat initialization if a response is loading
+    if (!chatRoomId) {
+      navigate("/");
+      setCurrentChatsHistory([]); // optional: remove if reset is not needed
+      return;
+    }
+
     try {
-      const { chatRoomId } = params;
-      if (!chatRoomId) return;
       if (!user) {
-        // fetch user data from indexDB
+        // fetch from indexDB
         const chats = await Idb.getChatsByChatRoomId(chatRoomId);
         setCurrentChatsHistory(chats);
       } else {
-        // fetch user data from mongoDB
+        // fetch from backend
         const chatData = await chatService.getAllChats({ chatRoomId });
         setCurrentChatsHistory(chatData);
       }
     } catch (error) {
       console.error("Error fetching chat data:", error);
-      toast.error("Error while fetching chat data", {
-        toastId: "chat-fetch-error",
-      });
+      toast.error("Failed to fetch chat data", { toastId: "chat-fetch-error" });
     }
-  }, [params, user]);
+  }, [chatRoomId, user, navigate, setCurrentChatsHistory]);
 
   useEffect(() => {
     getChatData();
