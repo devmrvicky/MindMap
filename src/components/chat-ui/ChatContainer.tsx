@@ -1,28 +1,36 @@
 import { useImageStore, useModelStore, useChatStore } from "@/zustand/store";
 import Chat from "./Chat";
 import Loading from "../utils/Loading";
-import { useRef } from "react";
-import { useEffect } from "react";
+// import { useRef } from "react";
+import { RefObject, useEffect } from "react";
 import ImgSkeleton from "../utils/ImgSkelaton";
 import { CircleAlert } from "lucide-react";
 import RegenerateResBtn from "../buttons/RegenerateResBtn";
 
-const ChatContainer = ({ streamResponse }: { streamResponse: string }) => {
+const ChatContainer = ({
+  streamResponse,
+  chatRef,
+  smoothScrollToBottom,
+}: {
+  streamResponse: string;
+  chatRef: RefObject<HTMLDivElement | null>;
+  smoothScrollToBottom: () => void;
+}) => {
   const { currentChatsHistory } = useChatStore((store) => store);
   const { isResponseLoading, LLMResponsedError } = useModelStore(
     (store) => store
   );
   const { imageGenerationOn } = useImageStore((store) => store);
 
-  const chatRef = useRef<HTMLDivElement | null>(null);
+  // const chatRef = useRef<HTMLDivElement | null>(null);
 
-  const smoothScrollToBottom = () => {
-    setTimeout(() => {
-      if (chatRef.current) {
-        chatRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 0);
-  };
+  // const smoothScrollToBottom = () => {
+  //   setTimeout(() => {
+  //     if (chatRef.current) {
+  //       chatRef.current.scrollIntoView({ behavior: "smooth" });
+  //     }
+  //   }, 0);
+  // };
 
   useEffect(() => {
     smoothScrollToBottom();

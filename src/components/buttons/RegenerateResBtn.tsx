@@ -30,7 +30,7 @@ const RegenerateResBtn = ({
   };
 
   return (
-    <div className="flex items-center justify-center border rounded-2xl max-w-fit">
+    <div className="flex items-center justify-center border rounded-2xl max-w-fit  backdrop-blur-2xl bg-[#000000]/50">
       <Button
         variant="outline"
         className="btn btn-secondary btn-sm cursor-pointer border-none"

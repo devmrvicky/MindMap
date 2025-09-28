@@ -3,10 +3,11 @@ import GreetingMessageComp from "../GreetingMessage";
 import ChatContainer from "./ChatContainer";
 import ChatInput from "./ChatInput";
 import { useChatStore } from "@/zustand/store";
-import { useRef } from "react";
 import { useChatInit } from "@/hooks/useChatInit";
 import ChatSkeleton from "./ChatSketeton";
 import { useParams } from "react-router";
+import { UserQueryListPopup } from "./UserQueryListPopup";
+import { useRef } from "react";
 
 const ChatUI = () => {
   const currentChatsHistory = useChatStore((s) => s.currentChatsHistory);
@@ -18,6 +19,17 @@ const ChatUI = () => {
   useChatInit({ setCurrentChatsHistory });
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const chatRef = useRef<HTMLDivElement | null>(null);
+
+  const smoothScrollToBottom = () => {
+    console.log(chatRef);
+    setTimeout(() => {
+      if (chatRef.current) {
+        chatRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 0);
+  };
 
   return (
     <div className="bg-white dark:bg-black w-full h-full chat-container">
@@ -33,7 +45,19 @@ const ChatUI = () => {
 
         {chatRoomId &&
           (currentChatsHistory.length > 0 ? (
-            <ChatContainer streamResponse="" />
+            <>
+              <UserQueryListPopup
+                userQueries={currentChatsHistory
+                  .filter((chat) => chat.role === "user")
+                  .map((chat) => chat.content[0].content)}
+                smoothScrollToBottom={smoothScrollToBottom}
+              />
+              <ChatContainer
+                streamResponse=""
+                chatRef={chatRef}
+                smoothScrollToBottom={smoothScrollToBottom}
+              />
+            </>
           ) : (
             <ChatSkeleton />
           ))}

@@ -7,6 +7,7 @@ import ImgPopup from "../utils/ImgPopup";
 import { Button } from "../ui/button";
 import "katex/dist/katex.css";
 import MarkdownRender from "../MarkdownRender";
+import { useScrollDetection } from "@/hooks/useScrollDetection";
 
 const Chat = ({
   message,
@@ -34,9 +35,7 @@ const Chat = ({
   );
   const [currentActiveTabNo, setCurrentActiveTabNo] = useState<number>(1);
 
-  // const { isScrollDown, isScrollUp } = useScrollDetection();
-
-  // console.log({ isScrollDown, isScrollUp });
+  const { isScrollDown } = useScrollDetection();
 
   function getThinkingAndResponse({
     content,
@@ -98,8 +97,9 @@ const Chat = ({
       key={message.chatId}
       className={`flex flex-col py-1 ${
         message.role === "user" ? "items-end" : "justify-star"
-      }`}
+      } relative`}
       ref={chatRef}
+      id={message.chatId}
     >
       {message.role === "user" ? (
         <>
@@ -194,7 +194,9 @@ const Chat = ({
           role={message.role}
           chatId={message.chatId}
           model={message.content[currentActiveTabNo - 1].model}
-          className={`${
+          className={`sticky ${
+            isScrollDown ? "bottom-5" : "bottom-[150px]"
+          }   ${
             index + 1 === totalChats &&
             !isLLmResponseLoading &&
             !errorRes &&

@@ -10,7 +10,7 @@ const SpeekBtn = ({ text }: { text: string }) => {
     useState<SpeechSynthesisVoice | null>(null);
 
   return (
-    <div className="flex border rounded-2xl items-center">
+    <div className="flex border rounded-2xl items-center  backdrop-blur-2xl bg-[#000000]/50">
       {!isSpeaking ? (
         <>
           <Button
