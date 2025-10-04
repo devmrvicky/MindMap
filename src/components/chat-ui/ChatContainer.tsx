@@ -38,19 +38,23 @@ const ChatContainer = ({
 
   return (
     <div className={`flex flex-col gap-4 w-full h-full`}>
-      {currentChatsHistory.map((message, index) => (
-        <Chat
-          key={message.chatId}
-          // fileUrls={message.fileUrls}
-          message={message}
-          streamResponse={streamResponse}
-          index={index}
-          totalChats={currentChatsHistory.length}
-          isLLmResponseLoading={isResponseLoading}
-          chatRef={chatRef}
-          errorRes={Boolean(LLMResponsedError)}
-        />
-      ))}
+      {currentChatsHistory
+        .sort((a, b) =>
+          a.createdAt && b.createdAt && a.createdAt > b?.createdAt ? 1 : -1
+        )
+        .map((message, index) => (
+          <Chat
+            key={message.chatId}
+            // fileUrls={message.fileUrls}
+            message={message}
+            streamResponse={streamResponse}
+            index={index}
+            totalChats={currentChatsHistory.length}
+            isLLmResponseLoading={isResponseLoading}
+            chatRef={chatRef}
+            errorRes={Boolean(LLMResponsedError)}
+          />
+        ))}
 
       {isResponseLoading && (imageGenerationOn ? <ImgSkeleton /> : <Loading />)}
 

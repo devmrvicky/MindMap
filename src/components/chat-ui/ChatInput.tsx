@@ -25,9 +25,8 @@ const ChatInput = () => {
   const prevClass = useRef<string>("h-[50px]");
 
   const { getLLMResponse } = useLLMRequest();
-  const uploadedImgs = useImageUploadStore(
-    (state) => state.uploadedImgs
-  );
+  const uploadedImgs = useImageUploadStore((state) => state.uploadedImgs);
+
   const { chatRoomId } = useParams();
 
   const isMobile = useIsMobile();
@@ -125,7 +124,10 @@ const ChatInput = () => {
       />
       <div className="flex w-full">
         {/* <p>tools</p> */}
-        <ChatInputToolsBtn setPrompt={setPrompt} setWantToImgUpload={setWantToImgUpload}/>
+        <ChatInputToolsBtn
+          setPrompt={setPrompt}
+          setWantToImgUpload={setWantToImgUpload}
+        />
 
         {/* request submit button */}
         <Button

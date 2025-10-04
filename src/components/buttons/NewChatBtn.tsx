@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import useKeyboardShortcut from "@/hooks/useKeyboardShortcut";
 import { useCallback } from "react";
 
-const NewChatBtn = () => {
+const NewChatBtn = ({ textClasses = "" }: { textClasses?: string }) => {
   const navigate = useNavigate();
   const setCurrentChatsHistory = useChatStore(
     (store) => store.setCurrentChatsHistory
@@ -31,7 +31,7 @@ const NewChatBtn = () => {
       className="cursor-pointer active:scale-90 transition-transform duration-200 bg-zinc-400/10 hover:bg-zinc-400/20 text-zinc-600 dark:text-white hover:text-zinc-900"
       onClick={handleClickOnNewChatButton}
     >
-      <PenLine /> New chat
+      <PenLine /> <span className={`${textClasses}`}>New Chat</span>
     </Button>
   );
 };

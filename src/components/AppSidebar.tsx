@@ -20,7 +20,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <Logo />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="hideScrollbar">
         <NavMain />
       </SidebarContent>
       <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>

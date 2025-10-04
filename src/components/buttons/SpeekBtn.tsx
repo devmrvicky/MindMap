@@ -9,6 +9,9 @@ const SpeekBtn = ({ text }: { text: string }) => {
   const [selectedVoice, setSelectedVoice] =
     useState<SpeechSynthesisVoice | null>(null);
 
+  // useEffect(() => {
+  //   handleStartSpeak({ text, selectedVoice: selectedVoice });
+  // }, []);
   return (
     <div className="flex border rounded-2xl items-center  backdrop-blur-2xl bg-[#000000]/50">
       {!isSpeaking ? (

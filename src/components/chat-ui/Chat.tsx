@@ -161,7 +161,7 @@ const Chat = ({
             </div>
           )}
           <div
-            className={`w-full rounded-lg px-4 py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
+            className={`w-full rounded-lg min-[520px]:px-4 px-0 py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
           >
             {thinking && (
               <Collapsible defaultOpen={false} className="group/collapsible">

@@ -72,7 +72,7 @@ const useWebSpeech = () => {
     // recognition.lang = "hi-IN"; // or "" for Hindi, etc.
     recognition.lang = "en-US"; // or "hi-IN" for Hindi, etc.
     recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.maxAlternatives = 5;
 
     recognition.onresult = (event: any) => {
       console.log(event);

@@ -9,6 +9,8 @@ import AuthCallback from "./pages/auth/AuthCallback.tsx";
 import Models from "./pages/Models.tsx";
 import PageLayout from "./pages/PageLayout.tsx";
 import MainAside from "./pages/ai-chat/MainAside.tsx";
+import ShareChat from "./pages/ShareChat.tsx";
+import NotFound from "./pages/error/NotFound.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -24,7 +26,13 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/page" element={<PageLayout />}>
             <Route path="/page/models" element={<Models />} />
           </Route>
+          {/* share chat route */}
+          <Route path="/share" element={<ShareChat />} />
+          <Route path="/share/:chatRoomId" element={<MainAside />} />
         </Route>
+
+        {/* error pages */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

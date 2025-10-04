@@ -7,6 +7,7 @@ import { useScrollDetection } from "@/hooks/useScrollDetection";
 import NewChatBtn from "../buttons/NewChatBtn";
 import SidebarButton from "../buttons/SidebarButton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import ChatRoomShareBtn from "../buttons/ChatRoomShareBtn";
 
 const ChatUIHeader = () => {
   const user = useAuthStore((store) => store.user);
@@ -15,7 +16,7 @@ const ChatUIHeader = () => {
   const isMobile = useIsMobile();
   return (
     <header
-      className={`flex h-16 shrink-0 items-center gap-2 transition-[width,height,top] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 p-2 ${
+      className={`flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height,top] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 p-2 overflow-hidden ${
         isScrollUp ? "sticky top-0" : "sticky top-[-100px]"
       } bg-white/80 dark:bg-[#171717]/80 backdrop-blur-sm z-10 `}
     >
@@ -26,15 +27,17 @@ const ChatUIHeader = () => {
         {/* here was bradcrumb */}
         <ModelSwitcher />
       </div>
-      <div className="ml-auto flex items-center gap-2 pr-4">
-        {isMobile && currentChatsHistory.length > 0 && <NewChatBtn />}
+      <div className=" flex items-center gap-2 pr-4">
+        {isMobile && currentChatsHistory.length > 0 && (
+          <NewChatBtn textClasses="min-[520px]:inline hidden" />
+        )}
         {!user ? (
           <>
             <LoginPageNavigationBtn />
             <SignupPageNavigationBtn />
           </>
         ) : (
-          ""
+          currentChatsHistory.length > 0 && <ChatRoomShareBtn />
         )}
       </div>
     </header>

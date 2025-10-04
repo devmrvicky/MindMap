@@ -55,6 +55,50 @@ export default class ChatRoomService {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
   }
+
+  async getSharedChatRoom({ chatRoomId }: { chatRoomId: string }) {
+    try {
+      const res = await axiosConfig.get(`/chatroom/shared/${chatRoomId}`);
+      if (res.status === 404) {
+        console.error(res.data.message);
+        return [];
+      }
+      if (res.status !== 200) {
+        throw new Error(res.data.message);
+      }
+      return res.data.data as Chat[];
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : "Unknown error");
+    }
+  }
+
+  async createSharedChatRoom({ chatRoomId }: { chatRoomId: string }) {
+    try {
+      const res = await axiosConfig.post("chatroom/shared/create", {
+        chatRoomId,
+      });
+      if (res.status !== 201) {
+        throw new Error(res.data.message);
+      }
+      return res.data.data;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : "Unknown error");
+    }
+  }
+
+  async deleteSharedChatRoom({ chatRoomId }: { chatRoomId: string }) {
+    try {
+      const res = await axiosConfig.delete(
+        `chatroom/shared/delete/${chatRoomId}`
+      );
+      if (res.status !== 200) {
+        throw new Error(res.data.message);
+      }
+      return res.data.data;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : "Unknown error");
+    }
+  }
 }
 
 export const chatRoomService = new ChatRoomService();

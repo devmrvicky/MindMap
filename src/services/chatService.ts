@@ -16,9 +16,20 @@ export default class ChatService {
     }
   }
 
-  async createChat({ chat, user }: { chat: Chat; user: User | null }) {
+  async createChat({
+    chat,
+    chatCreatedTime,
+    user,
+  }: {
+    chat: Chat;
+    chatCreatedTime: number;
+    user: User | null;
+  }) {
     try {
-      await Idb.updateData({ data: chat, storeName: "chat" });
+      await Idb.updateData({
+        data: { ...chat, createdAt: chatCreatedTime },
+        storeName: "chat",
+      });
       if (!user) return;
       const res = await axiosConfig.post(`/chat/create/${chat.chatRoomId}`, {
         fileUrls: JSON.stringify(chat.content[0].fileUrls || []),

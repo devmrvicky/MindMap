@@ -1,6 +1,8 @@
 import SpeekBtn from "./buttons/SpeekBtn";
 import CopyBtn from "./buttons/CopyBtn";
 import RegenerateResBtn from "./buttons/RegenerateResBtn";
+import { extractRawTextFromMarkdown } from "@/tool-methods/extractRawTextFromMd";
+import ChatShareBtn from "./buttons/ChatShareBtn";
 
 const ChatActionsBtns = ({
   message,
@@ -17,13 +19,16 @@ const ChatActionsBtns = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-2 bg-transparent rounded-2xl mt-2 ${className}`}
+      className={`flex items-center gap-2 bg-transparent rounded-2xl mt-2 overflow-x-auto ${className}`}
     >
       <CopyBtn text={message} />
       {role === "assistant" && (
-        <RegenerateResBtn chatId={chatId} model={model} />
+        <>
+          <RegenerateResBtn chatId={chatId} model={model} />
+          <ChatShareBtn chat={message} />
+        </>
       )}
-      <SpeekBtn text={message} />
+      <SpeekBtn text={extractRawTextFromMarkdown(message)} />
     </div>
   );
 };

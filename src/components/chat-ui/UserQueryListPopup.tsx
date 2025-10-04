@@ -1,7 +1,3 @@
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useRef } from "react";
-// import { useScroll } from "react-scroll-hook";
-// import {list-indent-decrease} from ""
 import {
   Dialog,
   DialogTrigger,
@@ -18,21 +14,6 @@ export const UserQueryListPopup = ({
   userQueries: string[];
   smoothScrollToBottom: () => void;
 }) => {
-  const isMobile = useIsMobile();
-  const scrollRef = useRef<HTMLElement | null>(null);
-
-  // const handleQueryClick = (query: string) => {
-  //   if (scrollRef.current) {
-  //     scrollRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // };
-
-  // if (isMobile) {
-  //   return <DialogTrigger asChild />;
-  // } else {
-  //   return <DialogContent className="w-full max-w-md" />;
-  // }
-
   return (
     <Dialog>
       <DialogTrigger
@@ -43,11 +24,11 @@ export const UserQueryListPopup = ({
           <ListCollapseIcon className="min-w-5 min-h-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-md h-[500px]">
+      <DialogContent className="w-full max-w-md h-[500px] flex flex-col gap-3">
         <DialogDescription className="text-sm font-semibold">
           Click on any query to scroll to that query
         </DialogDescription>
-        <ul className="overflow-y-auto">
+        <ul className="overflow-y-auto flex flex-col">
           {userQueries.map((query, i) => (
             <li
               key={query}

@@ -83,6 +83,7 @@ const useCreateData = () => {
     model,
   }: createChatProps) => {
     try {
+      const chatCreatedTime = Date.now();
       const newChat: Chat = {
         chatId: uuidv1(),
         role,
@@ -98,13 +99,13 @@ const useCreateData = () => {
       };
 
       // update zustand store to see ui effect (this function is responsible for updating all chat history and current chat history. this function will update chats history because we have to filtered chats for deleting and will update current chat history because updating chat ui)
-      addNewChat(newChat);
+      addNewChat({ ...newChat, createdAt: chatCreatedTime });
 
       // set the response loading state to true
       setIsResponseLoading(true);
 
       // create chat in mongoDB(condition: when user logged in means if user has value)
-      await chatService.createChat({ chat: newChat, user });
+      await chatService.createChat({ chat: newChat, chatCreatedTime, user });
     } catch (error) {
       // set the response loading state to false
       setIsResponseLoading(false);

@@ -17,6 +17,8 @@ import GetLatestModelBtn from "@/components/buttons/GetLatestModelsBtn";
 import ModelFilterBtn from "@/components/buttons/ModelFilterBtn";
 import CopyBtn from "@/components/buttons/CopyBtn";
 import LlmService from "@/services/llmService";
+import { ModelParameters } from "@/components/ModelParameters";
+import BackBtn from "@/components/buttons/BackBtn";
 
 const llmService = new LlmService();
 
@@ -48,8 +50,10 @@ const Models = () => {
   // search models
   const searchModels = (searchParam: string) => {
     setCurrentAvailableModels((prevModels) =>
-      prevModels.filter((model) =>
-        model.name.toLowerCase().includes(searchParam.toLowerCase())
+      prevModels.filter(
+        (model) =>
+          model.name.toLowerCase().includes(searchParam.toLowerCase()) ||
+          model.supported_parameters.includes(searchParam.toLowerCase())
       )
     );
   };
@@ -59,8 +63,9 @@ const Models = () => {
     // if filter is all, show all models
     if (filter === "all") {
       (async () => {
-        const models = await getModels({});
-        setCurrentAvailableModels(models);
+        // const models = await getModels({});
+        // setCurrentAvailableModels(models);
+        setCurrentAvailableModels(currentAvailableModels);
       })();
       return;
     }
@@ -129,15 +134,23 @@ const Models = () => {
 
   return (
     <section className="p-4 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold mb-4">Available Models</h1>
-        <div className="flex items-center gap-2">
-          <GetLatestModelBtn
-            refreshModels={refreshModels}
-            modelRefreshing={modelRefreshing}
-          />
-          <ModelSortBtn sortModels={sortModels} />
-          <ModelFilterBtn filterModels={filterModels} />
+      <div className="flex flex-col justify-between">
+        <div className="flex items-center gap-3 py-2">
+          {/* back button */}
+          <BackBtn />
+          {/* bradcrumb */}
+          {/* <BreadcrumbComponent items={["/", "Page", "Models"]} /> */}
+        </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold mb-4">Available Models</h1>
+          <div className="flex items-center gap-2">
+            <GetLatestModelBtn
+              refreshModels={refreshModels}
+              modelRefreshing={modelRefreshing}
+            />
+            <ModelSortBtn sortModels={sortModels} />
+            <ModelFilterBtn filterModels={filterModels} />
+          </div>
         </div>
       </div>
 
@@ -158,6 +171,7 @@ const Models = () => {
                   className="cursor-pointer"
                 />
               </div>
+
               <div className="flex items-center gap-4 mb-1">
                 <span className="text-xs">{model.id}</span>
                 <CopyBtn
@@ -165,6 +179,8 @@ const Models = () => {
                   className="border-none p-0 bg-transparent"
                 />
               </div>
+              {/* suport parameter */}
+              <ModelParameters parameters={model.supported_parameters} />
               <p className="text-gray-600 mb-2">
                 {model.description.slice(0, 100) + "..."}
               </p>

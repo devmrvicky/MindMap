@@ -9,6 +9,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import "highlight.js/styles/github-dark.css"; // choose your theme
 import "katex/dist/katex.min.css";
 import { ImgPopup } from "../components/utils/ImgPopup";
+import { extractText } from "@/tool-methods/extractText";
 
 interface Props {
   content: string;
@@ -24,49 +25,6 @@ const mathSchema = {
       ["className"], // allow katex classes
     ],
   },
-};
-
-interface ReactTransitionalElement {
-  $$typeof: symbol;
-  key: string;
-  props: {
-    children: string;
-    className: string;
-    key?: string | number;
-  };
-  type: string;
-  _owner: FiberNode;
-  _store: {
-    validated: number;
-  };
-  ref: null;
-  _debugInfo: null;
-  _debugStack: Error;
-}
-
-interface FiberNode {
-  tag: number;
-  key: null | string | number;
-  stateNode: null | any;
-  elementType: Function;
-  type: Function;
-  // Add other properties as needed
-}
-
-/** Recursively extract text from React children / AST nodes */
-const extractText = (node: any): string => {
-  if (node == null) return "";
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(extractText).join("");
-  if (React.isValidElement(node))
-    return extractText(
-      (node.props && (node as ReactTransitionalElement).props.children) ?? ""
-    );
-  if (typeof node === "object") {
-    if (typeof node.value === "string") return node.value;
-    if (node.children) return extractText(node.children);
-  }
-  return "";
 };
 
 const MarkdownMessage: React.FC<Props> = ({ content, isUser }) => {
@@ -87,7 +45,7 @@ const MarkdownMessage: React.FC<Props> = ({ content, isUser }) => {
       className={`${
         isUser
           ? "bg-[#131313] text-white max-w-[75%] px-4 py-2 rounded-2xl rounded-tr-none shadow-md"
-          : "rounded-2xl px-4 py-3 shadow-sm max-w-[100%] whitespace-pre-wrap"
+          : `rounded-2xl min-[520px]:px-4 px-0 py-3 shadow-sm max-w-[100%] whitespace-pre-wrap`
       }`}
     >
       <div className="prose prose-sm dark:prose-invert max-w-none">

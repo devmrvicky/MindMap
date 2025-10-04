@@ -57,10 +57,10 @@ const ChooseModel = ({
       <DropdownMenuTrigger className="btn btn-secondary btn-sm">
         <Button
           variant="outline"
-          className="border-none cursor-pointer flex items-center justify-between gap-2"
+          className="border-none cursor-pointer flex items-center justify-between gap-2 w-[200px] md:w-full"
           title="change model"
         >
-          <span>
+          <span className="line-clamp-1 text-nowrap overflow-x-hidden whitespace-nowrap text-ellipsis">
             {chatModels.find((chatModel) => chatModel.id === model)?.name ??
               model}
           </span>

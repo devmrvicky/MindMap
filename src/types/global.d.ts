@@ -11,6 +11,7 @@ declare global {
       model: string;
     }[];
     chatRoomId: string;
+    createdAt?: number;
   }
 
   interface ChatStoreState {
