@@ -2,8 +2,7 @@ import { useImageUploadStore } from "@/zustand/store";
 import { Textarea } from "@/components/ui/textarea";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { useRef, useState } from "react";
-import { ArrowUp, Loader } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import LoginDialog from "../LoginDialog";
 import { AxiosError } from "axios";
@@ -105,7 +104,7 @@ const ChatInput = () => {
             e.currentTarget.blur(); // Remove focus from the input after sending
           } else if (e.key === "Enter" && e.shiftKey) {
             e.preventDefault();
-            setPrompt((prev) => prev + "\n\n");
+            setPrompt((prev) => prev + "\n");
             console.log(e);
             const textarea = e.currentTarget as HTMLTextAreaElement;
             setTimeout(() => {
@@ -125,24 +124,10 @@ const ChatInput = () => {
       <div className="flex w-full">
         {/* <p>tools</p> */}
         <ChatInputToolsBtn
+          prompt={prompt}
           setPrompt={setPrompt}
           setWantToImgUpload={setWantToImgUpload}
         />
-
-        {/* request submit button */}
-        <Button
-          variant="outline"
-          className="bg-white rounded-full w-10 h-10 flex items-center justify-center mt-2 ml-auto cursor-pointer"
-          onClick={() => {
-            if (prompt.trim()) {
-              handleSendChatRequest(prompt);
-              setPrompt("");
-            }
-          }}
-          disabled={!prompt.trim()}
-        >
-          <ArrowUp className="min-w-2 min-h-2" />
-        </Button>
       </div>
       {/* login dialog component */}
       <LoginDialog open={dialogOpen} onOpenChange={setDialogOpen} />

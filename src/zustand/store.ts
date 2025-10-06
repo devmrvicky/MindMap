@@ -112,6 +112,11 @@ const useModelStore = create<ChatModelStoreState>((set) => ({
     id: "mistralai/mistral-small-3.1-24b-instruct:free",
     label: "free",
   },
+  chatRequestAbortController: undefined,
+  setChatRequestAbortController: (controller: AbortController | undefined) =>
+    set(() => ({
+      chatRequestAbortController: controller,
+    })),
   isResponseLoading: false,
   setIsResponseLoading: (isLoading: boolean) =>
     set(() => ({

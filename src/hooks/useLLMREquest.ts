@@ -30,6 +30,9 @@ const useLLMRequest = () => {
     (state) => state.setLLMResponsedError
   );
   const currentLLMModel = useModelStore((state) => state.currentLLMModel);
+  const setChatRequestAbortController = useModelStore(
+    (state) => state.setChatRequestAbortController
+  );
   const uploadedImgs = useImageUploadStore((store) => store.uploadedImgs);
   const setUploadedImgs = useImageUploadStore((store) => store.setUploadedImgs);
 
@@ -39,6 +42,8 @@ const useLLMRequest = () => {
 
   const navigate = useNavigate();
   const { chatRoomId } = useParams();
+
+  const controller = llmService.createAbortController();
 
   /*
 Logic:
@@ -66,6 +71,7 @@ Logic:
   ): Promise<string | undefined> {
     try {
       setLLMResponsedError(""); // reset the error state
+      setChatRequestAbortController(controller);
 
       let activeChatRoomId = chatRoomId || activeChatRoom?.chatRoomId;
 
@@ -117,6 +123,7 @@ Logic:
                 content: chat.content[0].content,
               }))
           ),
+          signal: controller.signal,
         });
       }
 

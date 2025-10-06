@@ -46,11 +46,14 @@ declare global {
     chatModels: Partial<Model>[];
     imageModels: Partial<Model>[];
     currentLLMModel: Partial<Model>;
+    chatRequestAbortController: AbortController | undefined;
+
     setIsResponseLoading: (isLoading: boolean) => void;
     setLLMResponsedError: (error: string) => void;
     changeCurrentLLMModel: (model: Partial<Model>) => void;
     toggleChatModel: (model: Partial<Model>) => void;
     setChatModels: (models: Partial<Model>[]) => void;
+    setChatRequestAbortController: (controller: AbortController) => void;
   }
 
   interface ImageUploadStoreState {

@@ -10,6 +10,7 @@ import "highlight.js/styles/github-dark.css"; // choose your theme
 import "katex/dist/katex.min.css";
 import { ImgPopup } from "../components/utils/ImgPopup";
 import { extractText } from "@/tool-methods/extractText";
+import { fixInvalidMarkdownImages } from "@/tool-methods/fixInvalidMarkdownImages";
 
 interface Props {
   content: string;
@@ -122,7 +123,7 @@ const MarkdownMessage: React.FC<Props> = ({ content, isUser }) => {
             },
           }}
         >
-          {content}
+          {fixInvalidMarkdownImages(content, isUser || false)}
         </ReactMarkdown>
       </div>
     </div>

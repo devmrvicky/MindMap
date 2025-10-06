@@ -1,11 +1,13 @@
 import { Idb } from "@/services/indexDB/indexDBService";
 import { axiosConfig, openrouterAxiosConfig } from "../api/axiosConfig";
+import axios from "axios";
 
 type GetChatLlmResponseProps = {
   prompt: string;
   model: string;
   fileUrls?: string[];
   prevResponses?: string;
+  signal?: AbortSignal
 };
 
 interface GetModelsPropType {
@@ -49,15 +51,22 @@ export default class LlmService {
     model,
     fileUrls,
     prevResponses,
+    signal
   }: GetChatLlmResponseProps) {
     try {
       // console.log(prevResponses);
-      const res = await axiosConfig.post("/llm/text/generate", {
-        prompt,
-        model,
-        fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
-        prevResponses,
-      });
+      const res = await axiosConfig.post(
+        "/llm/text/generate",
+        {
+          prompt,
+          model,
+          fileUrls: fileUrls ? JSON.stringify(fileUrls) : [],
+          prevResponses,
+        },
+        {
+          signal,
+        }
+      );
 
       if (res.status !== 200) {
         throw new Error("Failed to get LLM response");
@@ -65,7 +74,13 @@ export default class LlmService {
 
       return res.data.data;
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Unknown error");
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : axios.isCancel(error)
+          ? `'Request canceled', ${error.message}`
+          : "Unknown error"
+      );
     }
   }
 
@@ -85,6 +100,17 @@ export default class LlmService {
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");
     }
+  }
+
+  // ✅ Create abort controller for specific request
+  createAbortController(): AbortController {
+    return new AbortController();
+  }
+
+  // ✅ Fix typo
+  cancelRequest(controller: AbortController) {
+    console.log(controller)
+    controller.abort("User wants to cancel request");
   }
 }
 
