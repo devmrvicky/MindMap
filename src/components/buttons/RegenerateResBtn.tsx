@@ -30,14 +30,14 @@ const RegenerateResBtn = ({
   };
 
   return (
-    <div className="flex items-center justify-center border rounded-2xl max-w-fit  backdrop-blur-2xl bg-[#000000]/50">
+    <div className="flex items-center justify-center border rounded-2xl max-w-fit ">
       <Button
-        variant="outline"
-        className="btn btn-secondary btn-sm cursor-pointer border-none"
+        variant="ghost"
+        className=""
         title="Regenerate Response"
         // onClick={() => handleRegenerate()}
       >
-        <RefreshCcw size={20} />
+        <RefreshCcw />
       </Button>
       <ChooseModel model={model} handleRegenerate={handleRegenerate} />
     </div>

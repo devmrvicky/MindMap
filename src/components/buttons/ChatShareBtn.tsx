@@ -53,10 +53,10 @@ const ChatShareBtn = ({ className, chat }: ChatShareBtnProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={openDialog}
-          className={`cursor-pointer ${className} backdrop-blur-2xl bg-[#000000]/50`}
+          className={`cursor-pointer ${className} active:bg-[#000000]/50`}
         >
           <Share2 />
         </Button>

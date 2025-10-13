@@ -1,6 +1,7 @@
 import LoginPageNavigationBtn from "../buttons/auth/LoginPageNavigationBtn";
 import SignupPageNavigationBtn from "../buttons/auth/SignupPageNavigationBtn";
 import ChatRoomShareBtn from "../buttons/ChatRoomShareBtn";
+import ThemeSwitcherBtns from "../buttons/ThemeSwitcherBtns";
 import UserQueryListPopup from "../chat-ui/UserQueryListPopup";
 import MoreOptionPopover from "./MoreOptionPopover";
 
@@ -20,6 +21,9 @@ const NavMoreOptionPopover = ({
             .filter((chat) => chat.role === "user")
             .map((chat) => chat.content[0].content)}
         />
+        {/* theme */}
+        <ThemeSwitcherBtns />
+
         {!isUserExist ? (
           <div className="flex items-center justify-center gap-3 pt-2 border-t">
             <LoginPageNavigationBtn />

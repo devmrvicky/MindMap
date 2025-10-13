@@ -37,13 +37,13 @@ const CopyBtn = ({
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={() => copyToClipboard()}
       title={isCopied ? "Copied!" : "Copy to clipboard"}
-      className={`cursor-pointer ${className} backdrop-blur-2xl bg-[#000000]/50`}
+      className={`cursor-pointer ${className} `}
     >
-      {isCopied ? <Check size={20} /> : <Copy size={20} />}
+      {isCopied ? <Check /> : <Copy />}
     </Button>
   );
 };

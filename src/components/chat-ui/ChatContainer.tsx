@@ -26,6 +26,30 @@ const ChatContainer = ({
     smoothScrollToBottom();
   }, [currentChatsHistory.length]);
 
+  if (isResponseLoading) {
+    return (
+      <div className={`flex flex-col gap-4 w-full h-full`}>
+        {imageGenerationOn ? <ImgSkeleton /> : <Loading />}
+      </div>
+    );
+  }
+
+  // in case of error
+  if (LLMResponsedError) {
+    return (
+      <div className="flex mb-10 flex-col justity-start" ref={chatRef}>
+        <div className="text-red-500 text-left flex gap-2 items-center bg-red-500/10 px-4 mb-2 p-2 rounded-lg max-w-fit">
+          <CircleAlert className="w-6 h-6 mb-2" />
+          <p className="text-sm">
+            {LLMResponsedError ||
+              "An error occurred while processing your request."}
+          </p>
+        </div>
+        <RegenerateResBtn errorRes={Boolean(LLMResponsedError)} />
+      </div>
+    );
+  }
+
   return (
     <div className={`flex flex-col gap-4 w-full h-full`}>
       {currentChatsHistory
@@ -45,21 +69,6 @@ const ChatContainer = ({
             errorRes={Boolean(LLMResponsedError)}
           />
         ))}
-
-      {isResponseLoading && (imageGenerationOn ? <ImgSkeleton /> : <Loading />)}
-
-      {LLMResponsedError && (
-        <div className="flex mb-10 flex-col justity-start" ref={chatRef}>
-          <div className="text-red-500 text-left flex gap-2 items-center bg-red-500/10 px-4 mb-2 p-2 rounded-lg max-w-fit">
-            <CircleAlert className="w-6 h-6 mb-2" />
-            <p className="text-sm">
-              {LLMResponsedError ||
-                "An error occurred while processing your request."}
-            </p>
-          </div>
-          <RegenerateResBtn errorRes={Boolean(LLMResponsedError)} />
-        </div>
-      )}
     </div>
   );
 };

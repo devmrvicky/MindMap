@@ -7,7 +7,6 @@ import ImgPopup from "../utils/ImgPopup";
 import { Button } from "../ui/button";
 import "katex/dist/katex.css";
 import MarkdownRender from "../MarkdownRender";
-import { useScrollDetection } from "@/hooks/useScrollDetection";
 
 const Chat = ({
   message,
@@ -34,9 +33,6 @@ const Chat = ({
     message.content.length
   );
   const [currentActiveTabNo, setCurrentActiveTabNo] = useState<number>(1);
-
-  const { isScrollDown } = useScrollDetection();
-
   function getThinkingAndResponse({
     content,
   }: // role: "user" | "assistant",
@@ -139,29 +135,29 @@ const Chat = ({
         </>
       ) : (
         <>
-          {noOfResponses >= 1 && (
+          {noOfResponses > 1 && (
             <div className="flex items-center justify-between max-w-fit">
               <Button
-                variant="outline"
+                variant="ghost"
                 className="border-none"
                 onClick={() => handleChangeTab(currentActiveTabNo - 1)}
               >
-                <ChevronLeft size={20} className="mr-2" />
+                <ChevronLeft className="mr-2" />
               </Button>
               <p>
                 {currentActiveTabNo}/{noOfResponses}
               </p>
               <Button
-                variant="outline"
+                variant="ghost"
                 className="border-none"
                 onClick={() => handleChangeTab(currentActiveTabNo + 1)}
               >
-                <ChevronRight size={20} className="mr-2" />
+                <ChevronRight className="mr-2" />
               </Button>
             </div>
           )}
           <div
-            className={`w-full rounded-lg min-[520px]:px-4 px-0 py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
+            className={`w-full rounded-lg min-[520px]:px-4 p-0 min-[520px]:py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
           >
             {thinking && (
               <Collapsible defaultOpen={false} className="group/collapsible">
@@ -194,9 +190,7 @@ const Chat = ({
           role={message.role}
           chatId={message.chatId}
           model={message.content[currentActiveTabNo - 1].model}
-          className={`sticky ${
-            isScrollDown ? "bottom-5" : "bottom-[150px]"
-          }   ${
+          className={` ${
             index + 1 === totalChats &&
             !isLLmResponseLoading &&
             !errorRes &&

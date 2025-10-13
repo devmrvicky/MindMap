@@ -45,8 +45,8 @@ const MarkdownMessage: React.FC<Props> = ({ content, isUser }) => {
     <div
       className={`${
         isUser
-          ? "bg-[#131313] text-white max-w-[75%] px-4 py-2 rounded-2xl rounded-tr-none shadow-md"
-          : `rounded-2xl min-[520px]:px-4 px-0 py-3 shadow-sm max-w-[100%] whitespace-pre-wrap`
+          ? "dark:bg-[#131313] bg-[#ECECEE] dark:text-white text-zinc-950 max-w-[75%] px-4 py-2 rounded-2xl rounded-tr-none"
+          : `rounded-2xl min-[520px]:px-4 px-0 py-3 max-w-[100%] whitespace-pre-wrap`
       }`}
     >
       <div className="prose prose-sm dark:prose-invert max-w-none">
