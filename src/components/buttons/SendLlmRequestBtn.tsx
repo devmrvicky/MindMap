@@ -3,6 +3,8 @@ import { Button } from "../ui/button";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import { useModelStore } from "@/zustand/store";
+import { AbortControllerBtn } from "./AbortControllerBtn";
 
 const SendLlmRequestBtn = ({
   prompt,
@@ -12,6 +14,7 @@ const SendLlmRequestBtn = ({
   setPrompt: (prompt: string) => void;
 }) => {
   const { getLLMResponse } = useLLMRequest();
+  const isResponseLoading = useModelStore((store) => store.isResponseLoading);
 
   const handleSendChatRequest = async (prompt: string) => {
     try {
@@ -27,10 +30,14 @@ const SendLlmRequestBtn = ({
     }
   };
 
+  if (isResponseLoading) {
+    <AbortControllerBtn />;
+  }
+
   return (
     <Button
       variant="outline"
-      className="bg-white rounded-full w-10 h-10 flex items-center justify-center mt-2 ml-auto cursor-pointer"
+      className="bg-white rounded-full w-10 h-10 flex items-center justify-center cursor-pointer"
       onClick={() => handleSendChatRequest(prompt)}
       disabled={!prompt.trim()}
     >

@@ -15,7 +15,7 @@ const MicBtn = ({
       variant="outline"
       className={`${
         isListening ? "bg-zinc-300" : "bg-white"
-      } border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"`}
+      } border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer"`}
       onClick={() =>
         isListening
           ? handleStopListening()

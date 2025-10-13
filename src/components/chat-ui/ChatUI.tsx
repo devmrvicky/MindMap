@@ -1,7 +1,7 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import GreetingMessageComp from "../GreetingMessage";
 import ChatContainer from "./ChatContainer";
-import ChatInput from "./ChatInput";
+import ChatInput from "./ChatInputContainer";
 import { useChatStore } from "@/zustand/store";
 import { useChatInit } from "@/hooks/useChatInit";
 import ChatSkeleton from "./ChatSketeton";

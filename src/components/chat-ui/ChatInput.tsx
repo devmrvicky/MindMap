@@ -1,37 +1,33 @@
-import { useImageUploadStore } from "@/zustand/store";
-import { Textarea } from "@/components/ui/textarea";
-import useLLMRequest from "@/hooks/useLLMREquest";
-import { useRef, useState } from "react";
-import { Loader } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import LoginDialog from "../LoginDialog";
-import { AxiosError } from "axios";
-import { toast } from "react-toastify";
+import SendLlmRequestBtn from "../buttons/SendLlmRequestBtn";
+import MicBtn from "../buttons/MicBtn";
+import ChatInputToolsPopover from "../ChatInputToolsPopover";
+import { Textarea } from "../ui/textarea";
+import { useRef } from "react";
 import useWebSpeech from "@/hooks/useWebSpeech";
-import ChatInputToolsBtn from "../ChatInputToolsBtn";
+import { useIsMobile } from "@/hooks/use-mobile";
+import useLLMRequest from "@/hooks/useLLMREquest";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
-// import { Dispatch, SetStateAction } from "react";
-import { useParams } from "react-router";
-import { useScrollDetection } from "@/hooks/useScrollDetection";
-
-const ChatInput = () => {
-  // get all var to use mice button
-  const { recognitionRef } = useWebSpeech();
-  const [prompt, setPrompt] = useState<string>("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [wantToImgUpload, setWantToImgUpload] = useState(false);
-
-  const prevClass = useRef<string>("h-[50px]");
-
+export function ChatInput({
+  prompt,
+  setPrompt,
+  setWantToImgUpload,
+}: {
+  prompt: string;
+  setPrompt: React.Dispatch<React.SetStateAction<string>>;
+  setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { getLLMResponse } = useLLMRequest();
-  const uploadedImgs = useImageUploadStore((state) => state.uploadedImgs);
 
-  const { chatRoomId } = useParams();
+  const inputContainerClass = useRef<string>("grid-cols-[auto_1fr_auto]"); // grid-cols-[1fr_1fr] grid-rows-2
+  const popoverBtnClass = useRef<string>(""); // order-[2]
+  const inputClass = useRef<string>(""); //  col-span-2
+  const sendResponseBtnClass = useRef<string>(""); // order-last
 
+  // const prevHeight = useRef<string>("h-[60px]");
+  const { recognitionRef } = useWebSpeech();
   const isMobile = useIsMobile();
-
-  const { isScrollUp } = useScrollDetection();
-
   const handleSendChatRequest = async (prompt: string) => {
     try {
       await getLLMResponse(prompt);
@@ -45,54 +41,15 @@ const ChatInput = () => {
 
   return (
     <div
-      className={` bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm  shadow-2xl border max-w-[700px] w-full rounded-2xl my-3 flex flex-col items-center justify-center p-2 ${
-        chatRoomId
-          ? `transition-[bottom] duration-100 ease-in-out sticky ${
-              isScrollUp ? "bottom-2" : "bottom-[-100%]"
-            } max-w-[500px] bg-blend-hard-light z-50`
-          : ""
-      } `}
+      className={`border w-full grid ${inputContainerClass.current} items-center rounded-2xl  px-2 bg-zinc-800"`}
     >
-      {wantToImgUpload && uploadedImgs.length === 0 && (
-        <div className="w-full flex items-center gap-2 mb-2 top-[0px]  overflow-x-auto relative z-0">
-          <div className="w-[80px] h-[80px] rounded border flex items-center justify-center">
-            <Loader className="spin " />
-          </div>
-        </div>
-      )}
-
-      {/* uploaded images */}
-      {uploadedImgs.length > 0 && (
-        <div className="w-full flex items-center gap-2 mb-2 top-[0px]  overflow-x-auto relative z-0">
-          {/* {wantToImgUpload && (
-            <div className="w-[80px] h-[80px] rounded border flex items-center justify-center">
-              <Loader className="spin " />
-            </div>
-          )} */}
-          {uploadedImgs.map((img) => (
-            <div className="w-[80px] h-[80px] rounded border relative">
-              <img src={img.src} alt={img.name} className="w-fll h-full" />
-              <button
-                className="absolute top-0 right-0 text-red-500"
-                onClick={() =>
-                  useImageUploadStore.getState().removeImg(img.name)
-                }
-              >
-                &times;
-              </button>
-              {wantToImgUpload && (
-                <div className="w-[80px] h-[80px] rounded border flex items-center justify-center absolute top-0 right-0">
-                  <Loader className="spin " />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
+      <ChatInputToolsPopover
+        setWantToImgUpload={setWantToImgUpload}
+        className={`${popoverBtnClass.current}`}
+      />
       <Textarea
         placeholder="Ask me anything..."
-        className={`rounded-2xl h-[50px] max-h-[200px] w-full bg-white dark:bg-[#303033] placeholder:text-lg dark:text-white text-black border-none focus:outline-none focus:ring-0 focus:border-none shadow-none resize-none`}
+        className={`rounded-2xl  max-h-[200px] w-full bg-transparent placeholder:text-lg dark:text-white text-black border-none focus-visible:outline-none focus-visible:ring-0 focus-visible:border-none shadow-none resize-none dark:bg-input/0 py-4 px-2 ${inputClass.current} `}
         autoFocus
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -101,39 +58,34 @@ const ChatInput = () => {
           if (e.key === "Enter" && !e.shiftKey && prompt.trim() && !isMobile) {
             handleSendChatRequest(prompt);
             setPrompt("");
-            e.currentTarget.blur(); // Remove focus from the input after sending
-          } else if (e.key === "Enter" && e.shiftKey) {
+            e.currentTarget.focus();
+          } else if (
+            (e.key === "Enter" && isMobile) ||
+            (e.key === "Enter" && e.shiftKey)
+          ) {
             e.preventDefault();
             setPrompt((prev) => prev + "\n");
-            console.log(e);
+            // update classes of popover button, textarea and send request button
+            inputContainerClass.current =
+              "grid-cols-[auto_auto] grid-rows-[auto_auto] py-2";
+            inputClass.current = "col-span-2";
+            sendResponseBtnClass.current = "justify-end order-last";
+            popoverBtnClass.current = "order-[2]";
+
             const textarea = e.currentTarget as HTMLTextAreaElement;
-            setTimeout(() => {
-              if (textarea) {
-                textarea.scrollTop = textarea.scrollHeight;
-                console.log(textarea.scrollHeight);
-                textarea.classList.replace(
-                  prevClass.current,
-                  `h-[${textarea.scrollHeight}px]`
-                );
-                prevClass.current = `h-[${textarea.scrollHeight}px]`;
-              }
-            }, 0);
+            if (textarea) {
+              textarea.scrollTop = textarea.scrollHeight;
+              console.log(textarea.scrollHeight);
+            }
           }
         }}
       />
-      <div className="flex w-full">
-        {/* <p>tools</p> */}
-        <ChatInputToolsBtn
-          prompt={prompt}
-          setPrompt={setPrompt}
-          setWantToImgUpload={setWantToImgUpload}
-        />
+      <div
+        className={`flex items-center gap-2 ${sendResponseBtnClass.current}`}
+      >
+        <MicBtn setPrompt={setPrompt} />
+        <SendLlmRequestBtn prompt={prompt} setPrompt={setPrompt} />
       </div>
-      {/* login dialog component */}
-      <LoginDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   );
-};
-
-export default ChatInput;
-// This component is responsible for rendering the chat input field where users can type their messages. It uses Zustand for state management and handles sending the chat request to the LLM API.
+}
