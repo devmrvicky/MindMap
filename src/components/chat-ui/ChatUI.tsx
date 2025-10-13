@@ -6,7 +6,6 @@ import { useChatStore } from "@/zustand/store";
 import { useChatInit } from "@/hooks/useChatInit";
 import ChatSkeleton from "./ChatSketeton";
 import { useParams } from "react-router";
-import { UserQueryListPopup } from "./UserQueryListPopup";
 import { useRef } from "react";
 import { LockKeyhole } from "lucide-react";
 import { useScrollDetection } from "@/hooks/useScrollDetection";
@@ -76,19 +75,11 @@ const ChatUI = () => {
 
         {chatRoomId &&
           (currentChatsHistory.length > 0 ? (
-            <>
-              <UserQueryListPopup
-                userQueries={currentChatsHistory
-                  .filter((chat) => chat.role === "user")
-                  .map((chat) => chat.content[0].content)}
-                smoothScrollToBottom={smoothScrollToBottom}
-              />
-              <ChatContainer
-                streamResponse=""
-                chatRef={chatRef}
-                smoothScrollToBottom={smoothScrollToBottom}
-              />
-            </>
+            <ChatContainer
+              streamResponse=""
+              chatRef={chatRef}
+              smoothScrollToBottom={smoothScrollToBottom}
+            />
           ) : (
             <ChatSkeleton />
           ))}

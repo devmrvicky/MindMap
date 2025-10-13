@@ -1,13 +1,11 @@
 import { Separator } from "@/components/ui/separator";
 import { ModelSwitcher } from "../../components/ModelSwitcher";
-import SignupPageNavigationBtn from "../../components/buttons/auth/SignupPageNavigationBtn";
-import LoginPageNavigationBtn from "../../components/buttons/auth/LoginPageNavigationBtn";
 import { useAuthStore, useChatStore } from "@/zustand/store";
 import { useScrollDetection } from "@/hooks/useScrollDetection";
 import NewChatBtn from "../buttons/NewChatBtn";
 import SidebarButton from "../buttons/SidebarButton";
 import { useIsMobile } from "@/hooks/use-mobile";
-import ChatRoomShareBtn from "../buttons/ChatRoomShareBtn";
+import NavMoreOptionPopover from "../popover/NavMoreOptionPopover";
 
 const ChatUIHeader = () => {
   const user = useAuthStore((store) => store.user);
@@ -31,14 +29,10 @@ const ChatUIHeader = () => {
         {isMobile && currentChatsHistory.length > 0 && (
           <NewChatBtn textClasses="min-[520px]:inline hidden" />
         )}
-        {!user ? (
-          <>
-            <LoginPageNavigationBtn />
-            <SignupPageNavigationBtn />
-          </>
-        ) : (
-          currentChatsHistory.length > 0 && <ChatRoomShareBtn />
-        )}
+        <NavMoreOptionPopover
+          isUserExist={user ? true : false}
+          currentChatsHistory={currentChatsHistory}
+        />
       </div>
     </header>
   );

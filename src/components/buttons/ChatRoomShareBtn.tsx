@@ -47,7 +47,7 @@ const ChatRoomShareBtn = ({ className }: ChatRoomShareBtnProps) => {
           variant="outline"
           size="icon"
           onClick={openDialog}
-          className={`cursor-pointer ${className} backdrop-blur-2xl bg-[#000000]/50 min-[520px]:w-[80px] px-2 min-[520px]:rounded-3xl`}
+          className={`cursor-pointer ${className} backdrop-blur-2xl bg-[#000000]/50 w-full px-2 min-[520px]:rounded-3xl`}
         >
           <Share />
           <span className="min-[520px]:inline hidden ">share</span>

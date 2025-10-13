@@ -41,7 +41,7 @@ export function ChatInput({
 
   return (
     <div
-      className={`border w-full grid ${inputContainerClass.current} items-center rounded-2xl  px-2 bg-zinc-800"`}
+      className={`border w-full grid ${inputContainerClass.current} items-center rounded-2xl  px-2 bg-zinc-800/80 dark:bg-zinc-900/80 backdrop-blur-sm shadow-2xl`}
     >
       <ChatInputToolsPopover
         setWantToImgUpload={setWantToImgUpload}

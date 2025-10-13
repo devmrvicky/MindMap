@@ -1,50 +1,50 @@
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { ListCollapseIcon } from "lucide-react";
+import { ChevronRight, ListCollapseIcon } from "lucide-react";
+import { useState } from "react";
+import Popup from "../utils/Popup";
 
-export const UserQueryListPopup = ({
-  userQueries,
-  smoothScrollToBottom,
-}: {
-  userQueries: string[];
-  smoothScrollToBottom: () => void;
-}) => {
+const UserQueryListPopup = ({ userQueries }: { userQueries: string[] }) => {
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
-      <DialogTrigger
-        asChild
-        className="dark:bg-zinc-950 bg-zinc-50 fixed z-10 top-[80px] right-[50px] curpos-pointer"
-      >
-        <Button variant="ghost" className="">
-          <ListCollapseIcon className="min-w-5 min-h-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-full max-w-md h-[500px] flex flex-col gap-3">
-        <DialogDescription className="text-sm font-semibold">
-          Click on any query to scroll to that query
-        </DialogDescription>
-        <ul className="overflow-y-auto flex flex-col">
-          {userQueries.map((query, i) => (
-            <li
-              key={query}
-              className="flex items-center py-2 hover:dark:bg-zinc-800 px-2 hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-300 cursor-pointer"
-            >
-              <span
-                className="cursor-pointer"
-                onClick={() => smoothScrollToBottom()}
-              >
-                {`#${i + 1}. `}
-                {query.length > 200 ? `${query.slice(0, 200)}...` : query}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </DialogContent>
-    </Dialog>
+    <Popup
+      open={open}
+      setOpen={setOpen}
+      popupTitle="Queries list"
+      popupDescription=""
+    >
+      <TriggerButton setOpen={setOpen} />
+      <UserQueryLists userQueries={userQueries} />
+    </Popup>
   );
 };
+
+const TriggerButton = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
+  return (
+    <Button variant="ghost" className="" onClick={() => setOpen(true)}>
+      <ListCollapseIcon className="min-w-5 min-h-5 flex items-center gap-2 w-full" />{" "}
+      <span>Queries list</span>
+      <ChevronRight className="min-w-5 min-h-5 ml-auto" />
+    </Button>
+  );
+};
+
+// content
+const UserQueryLists = ({ userQueries }: { userQueries: string[] }) => {
+  return (
+    <ul className="overflow-y-auto flex flex-col p-3">
+      {userQueries.map((query, i) => (
+        <li
+          key={query}
+          className="flex items-center py-2 hover:dark:bg-zinc-800 px-2 hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-300 cursor-pointer"
+        >
+          <span className="cursor-pointer">
+            {`#${i + 1}. `}
+            {query.length > 200 ? `${query.slice(0, 200)}...` : query}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default UserQueryListPopup;
