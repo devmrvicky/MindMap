@@ -31,7 +31,7 @@ const SendLlmRequestBtn = ({
   };
 
   if (isResponseLoading) {
-    <AbortControllerBtn />;
+    return <AbortControllerBtn />;
   }
 
   return (

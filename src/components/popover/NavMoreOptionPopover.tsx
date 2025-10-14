@@ -3,7 +3,7 @@ import SignupPageNavigationBtn from "../buttons/auth/SignupPageNavigationBtn";
 import ChatRoomShareBtn from "../buttons/ChatRoomShareBtn";
 import ThemeSwitcherBtns from "../buttons/ThemeSwitcherBtns";
 import UserQueryListPopup from "../chat-ui/UserQueryListPopup";
-import MoreOptionPopover from "./MoreOptionPopover";
+import MoreOptionPopover from "../utils/popovers/MoreOptionPopover";
 
 const NavMoreOptionPopover = ({
   isUserExist,

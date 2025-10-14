@@ -113,10 +113,6 @@ const Chat = ({
                 />
               </div>
             ))}
-          {/* <div
-            className={`max-w-fit w-[400px] rounded-lg px-4 py-2  bg-blue-500 dark:bg-zinc-800 text-white rounded-br-none overflow-x-auto scrollable-container`}
-          >
-          </div> */}
           <div
             className="cursor-pointer w-full flex justify-end mb-4"
             onClick={() => setIsTruncated(!isTruncated)}
@@ -157,7 +153,7 @@ const Chat = ({
             </div>
           )}
           <div
-            className={`w-full rounded-lg min-[520px]:px-4 p-0 min-[520px]:py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 overflow-x-auto scrollable-container`}
+            className={`w-full rounded-lg min-[520px]:px-4 p-0 min-[520px]:py-2 bg-inherit text-gray-800 rounded-bl-none dark:text-zinc-300 scrollable-container`}
           >
             {thinking && (
               <Collapsible defaultOpen={false} className="group/collapsible">

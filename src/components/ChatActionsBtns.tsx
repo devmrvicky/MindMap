@@ -3,7 +3,7 @@ import CopyBtn from "./buttons/CopyBtn";
 import RegenerateResBtn from "./buttons/RegenerateResBtn";
 import { extractRawTextFromMarkdown } from "@/tool-methods/extractRawTextFromMd";
 import ChatShareBtn from "./buttons/ChatShareBtn";
-import MoreOptionPopover from "./popover/MoreOptionPopover";
+import MoreOptionPopover from "./utils/popovers/MoreOptionPopover";
 
 const ChatActionsBtns = ({
   message,
@@ -20,7 +20,7 @@ const ChatActionsBtns = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-2 bg-transparent rounded-2xl p-0 min-[520px]:px-4 overflow-x-auto ${className}`}
+      className={`flex items-center gap-2 bg-transparent rounded-2xl p-0 min-[520px]:px-4 overflow-x-auto h-full ${className}`}
     >
       <CopyBtn text={message} />
       {role === "assistant" && <ChatShareBtn chat={message} />}

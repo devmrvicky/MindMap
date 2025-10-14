@@ -14,6 +14,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import React from "react";
+import useBackButtonClose from "@/hooks/useBackButtonClose";
 
 const Popup = ({
   children,
@@ -30,11 +31,13 @@ const Popup = ({
 }) => {
   const isMobile = useIsMobile();
 
+  useBackButtonClose(open, () => setOpen(false), {});
+
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{children[0] as React.ReactNode}</DrawerTrigger>
-        <DrawerContent className="py-5">
+        <DrawerContent className="pb-5">
           <DrawerHeader className="text-left">
             <DrawerTitle> {popupTitle || ""}</DrawerTitle>
             <DrawerDescription>{popupDescription || ""}</DrawerDescription>
