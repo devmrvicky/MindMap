@@ -14,7 +14,7 @@ const NavMoreOptionPopover = ({
 }) => {
   return (
     <MoreOptionPopover>
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 p-4">
         <span className="text-xs text-zinc-500 italic">Options</span>
         <UserQueryListPopup
           userQueries={currentChatsHistory

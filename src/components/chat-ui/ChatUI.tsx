@@ -74,7 +74,7 @@ const ChatUI = () => {
         {!chatRoomId && <GreetingMessageComp />}
 
         {chatRoomId &&
-          (!(currentChatsHistory.length > 0) ? (
+          ((currentChatsHistory.length > 0) ? (
             <ChatContainer
               streamResponse=""
               chatRef={chatRef}
