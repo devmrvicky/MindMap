@@ -34,7 +34,7 @@ const Popup = ({
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{children[0] as React.ReactNode}</DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="py-5">
           <DrawerHeader className="text-left">
             <DrawerTitle> {popupTitle || ""}</DrawerTitle>
             <DrawerDescription>{popupDescription || ""}</DrawerDescription>
@@ -47,13 +47,8 @@ const Popup = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        asChild
-        className="hover:dark:bg-zinc-950 bg-zinc-800 cursor-pointer"
-      >
-        {children[0]}
-      </DialogTrigger>
-      <DialogContent className="w-full max-w-md h-[500px] flex flex-col gap-3">
+      <DialogTrigger asChild>{children[0]}</DialogTrigger>
+      <DialogContent className="w-full max-w-md h-auto flex flex-col gap-3">
         <DialogDescription className="text-sm font-semibold">
           {popupDescription || ""}
         </DialogDescription>

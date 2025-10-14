@@ -10,7 +10,7 @@ const MoreOptionPopover = ({ children }: { children: React.ReactNode }) => {
           <MoreHorizontal className="min-w-5 min-h-5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent>{children}</PopoverContent>
+      <PopoverContent className="w-fit">{children}</PopoverContent>
     </Popover>
   );
 };

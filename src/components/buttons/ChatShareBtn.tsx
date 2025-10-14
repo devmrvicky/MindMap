@@ -1,11 +1,5 @@
 import { Button } from "../ui/button";
 import { exportTextAsPDF, shareText } from "../../handlers/handleShares";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Share2, DownloadIcon, ChevronDown } from "lucide-react";
 import {
@@ -16,6 +10,7 @@ import {
 } from "../ui/dropdown-menu";
 import { saveChatAsPDF } from "@/handlers/handleChatSave";
 import { toast } from "react-toastify";
+import Popup from "../utils/Popup";
 
 type FileType = "PDF" | "docs" | "text";
 interface ChatShareBtnProps {
@@ -50,48 +45,43 @@ const ChatShareBtn = ({ className, chat }: ChatShareBtnProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={openDialog}
-          className={`cursor-pointer ${className} active:bg-[#000000]/50`}
-        >
-          <Share2 />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="p-6">
-        <DialogTitle>Share options</DialogTitle>
-        <div className="flex flex-col gap-6 items-center justify-center">
-          <div className="flex gap-2 items-center">
-            <span>Share Chat as </span>
-            <ShareChatFilesOption
-              currentFileType={currentFileType}
-              setCurrentFileType={setCurrentFileType}
-            />
-          </div>
-          <div className="flex items-center gap-4 justify-center w-full">
-            <Button
-              className="flex items-center gap-2 text-zinc-500 rounded-full hover:text-zinc-300 cursor-pointer text-sm"
-              variant="outline"
-              onClick={handleSaveChat}
-            >
-              <DownloadIcon className="w-4 h-4" />
-              <span>save as {currentFileType}</span>
-            </Button>
-            <Button
-              className="flex items-center gap-2 text-zinc-500 rounded-full hover:text-zinc-300 cursor-pointer text-sm"
-              variant="outline"
-              onClick={handleShareChat}
-            >
-              <Share2 className="w-4 h-4" />
-              <span>share as {currentFileType}</span>
-            </Button>
-          </div>
+    <Popup open={isOpen} setOpen={setIsOpen} popupTitle="Share Chat">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={openDialog}
+        className={`cursor-pointer ${className} active:bg-[#000000]/50`}
+      >
+        <Share2 />
+      </Button>
+      <div className="flex flex-col gap-6 items-center justify-center">
+        <div className="flex gap-2 items-center">
+          <span className="w-full">Share Chat as </span>
+          <ShareChatFilesOption
+            currentFileType={currentFileType}
+            setCurrentFileType={setCurrentFileType}
+          />
         </div>
-      </DialogContent>
-    </Dialog>
+        <div className="flex items-center gap-4 justify-center w-full">
+          <Button
+            className="flex items-center gap-2 text-zinc-500 rounded-full hover:text-zinc-300 cursor-pointer text-sm"
+            variant="outline"
+            onClick={handleSaveChat}
+          >
+            <DownloadIcon className="w-4 h-4" />
+            <span>save as {currentFileType}</span>
+          </Button>
+          <Button
+            className="flex items-center gap-2 text-zinc-500 rounded-full hover:text-zinc-300 cursor-pointer text-sm"
+            variant="outline"
+            onClick={handleShareChat}
+          >
+            <Share2 className="w-4 h-4" />
+            <span>share as {currentFileType}</span>
+          </Button>
+        </div>
+      </div>
+    </Popup>
   );
 };
 
@@ -112,7 +102,7 @@ const ShareChatFilesOption = ({
       <DropdownMenuTrigger className="btn btn-secondary btn-sm">
         <Button
           variant="outline"
-          className="border-none cursor-pointer flex items-center justify-between gap-2 w-[200px] md:w-full"
+          className="border-none cursor-pointer flex items-center justify-between gap-2 w-fit md:w-full"
           title="change model"
         >
           <span className="line-clamp-1 text-nowrap overflow-x-hidden whitespace-nowrap text-ellipsis">

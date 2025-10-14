@@ -22,9 +22,9 @@ const ChatInputContainer = () => {
     <div
       className={`${
         wantToImgUpload || uploadedImgs.length > 0
-          ? "bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm border rounded-2xl p-2"
+          ? "bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm border p-2"
           : ""
-      } shadow-2xl max-w-[700px] w-full my-3 flex flex-col items-center justify-center ${
+      } max-w-[700px] w-full my-3 flex flex-col items-center justify-center rounded-2xl ${
         chatRoomId
           ? `transition-[bottom] duration-100 ease-in-out sticky ${
               isScrollUp ? "bottom-2" : "bottom-[-100%]"

@@ -7,7 +7,7 @@ const ChatInputToolsBtn = ({
   setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
-    <div className="flex items-center justify-center gap-1">
+    <div className="flex flex-col items-center w-full gap-2">
       <FileUploadBtn setWantToImgUpload={setWantToImgUpload} />
       {/* image creation button */}
       <ImgCreationToogleBtn />

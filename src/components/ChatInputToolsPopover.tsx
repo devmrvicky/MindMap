@@ -20,7 +20,10 @@ const ChatInputToolsPopover = ({
           <Plus />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-fit h-fit">
+      <PopoverContent
+        align="start"
+        className="w-[200px] h-auto flex flex-col gap-2"
+      >
         <ChatInputToolsBtn setWantToImgUpload={setWantToImgUpload} />
       </PopoverContent>
     </Popover>

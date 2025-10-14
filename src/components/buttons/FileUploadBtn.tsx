@@ -4,13 +4,14 @@ import { useImageUploadStore } from "@/zustand/store";
 import { useRef } from "react";
 import { handleUpload } from "@/handlers/handleUpload";
 
-const FileUploadBtn = ({setWantToImgUpload}: {setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>}) => {
-  const addImg =
-    useImageUploadStore((store) => store.addImg);
-  const updateImg =
-    useImageUploadStore((store) => store.updateImg);
-  const setProgress =
-    useImageUploadStore((store) => store.setProgress);
+const FileUploadBtn = ({
+  setWantToImgUpload,
+}: {
+  setWantToImgUpload: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const addImg = useImageUploadStore((store) => store.addImg);
+  const updateImg = useImageUploadStore((store) => store.updateImg);
+  const setProgress = useImageUploadStore((store) => store.setProgress);
 
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,9 +20,10 @@ const FileUploadBtn = ({setWantToImgUpload}: {setWantToImgUpload: React.Dispatch
     <div>
       <Label
         htmlFor="file-upload"
-        className=" border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"
+        className=" rounded-full w-full h-10 flex items-center gap-3 cursor-pointer"
       >
         <Paperclip className="w-4" />
+        <span>File upload</span>
       </Label>
       <input
         type="file"

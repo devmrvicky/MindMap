@@ -26,14 +26,6 @@ const ChatContainer = ({
     smoothScrollToBottom();
   }, [currentChatsHistory.length]);
 
-  if (isResponseLoading) {
-    return (
-      <div className={`flex flex-col gap-4 w-full h-full`}>
-        {imageGenerationOn ? <ImgSkeleton /> : <Loading />}
-      </div>
-    );
-  }
-
   // in case of error
   if (LLMResponsedError) {
     return (
@@ -69,6 +61,9 @@ const ChatContainer = ({
             errorRes={Boolean(LLMResponsedError)}
           />
         ))}
+
+      {/* in case loading */}
+      {isResponseLoading && (imageGenerationOn ? <ImgSkeleton /> : <Loading />)}
     </div>
   );
 };

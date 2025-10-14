@@ -35,7 +35,7 @@ const UserQueryLists = ({ userQueries }: { userQueries: string[] }) => {
       {userQueries.map((query, i) => (
         <li
           key={query}
-          className="flex items-center py-2 hover:dark:bg-zinc-800 px-2 hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-300 cursor-pointer"
+          className="flex items-center py-2 hover:dark:bg-zinc-800 px-2 hover:bg-zinc-200 rounded hover:text-zinc-800 dark:text-zinc-500  cursor-pointer"
         >
           <span className="cursor-pointer">
             {`#${i + 1}. `}

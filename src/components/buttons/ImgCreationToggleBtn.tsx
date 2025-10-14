@@ -10,26 +10,16 @@ const ImgCreationToogleBtn = () => {
     <Toggle
       className={`${
         imageGenerationOn
-          ? "dark:bg-zinc-400 bg-balck"
-          : "bg-transparent dark:bg-zinc-800"
-      } border rounded-full w-10 h-10 flex items-center justify-center mt-2 cursor-pointer"`}
+          ? "dark:bg-zinc-400 bg-balck dark:text-zinc-900 text-white"
+          : "bg-transparent dark:text-white text-zinc-900"
+      } w-full h-10 flex items-center gap-3 cursor-pointer px-2"`}
       onClick={() => {
         console.log("image generation on");
         setImageGenerationOn(!imageGenerationOn);
       }}
     >
-      {/* <Button
-        variant="outline"
-        
-      > */}
-      <ImagePlus
-        className={`${
-          imageGenerationOn
-            ? "dark:text-zinc-900 text-white"
-            : "dark:text-white text-zinc-900"
-        } `}
-      />
-      {/* </Button> */}
+      <ImagePlus />
+      <span>Create image</span>
     </Toggle>
   );
 };
