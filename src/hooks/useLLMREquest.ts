@@ -30,6 +30,7 @@ const useLLMRequest = () => {
     (state) => state.setLLMResponsedError
   );
   const currentLLMModel = useModelStore((state) => state.currentLLMModel);
+
   const setChatRequestAbortController = useModelStore(
     (state) => state.setChatRequestAbortController
   );
@@ -63,14 +64,19 @@ Logic:
 
 */
 
-  async function getLLMResponse(
-    prompt: string,
-    // setStreamResponse: Dispatch<SetStateAction<string>>,
-    // streamResponse: string,
-    onLimitReached?: () => void
-  ): Promise<string | undefined> {
+  async function getLLMResponse({
+    prompt,
+    isRegeneratingErrorResponse = false,
+    onLimitReached,
+    model,
+  }: {
+    prompt: string;
+    isRegeneratingErrorResponse?: boolean;
+    onLimitReached?: () => void;
+    model?: Model["id"];
+  }): Promise<string | undefined> {
     try {
-      setLLMResponsedError(""); // reset the error state
+      setLLMResponsedError(null); // reset the error state
       setChatRequestAbortController(controller);
 
       let activeChatRoomId = chatRoomId || activeChatRoom?.chatRoomId;
@@ -90,15 +96,17 @@ Logic:
         navigate(`/c/${activeChatRoomId}`); // navigate to the new chat room
       }
 
-      // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (but only for role: user)
-      const err = await createChat({
-        activeChatRoomId,
-        fileUrls:
-          uploadedImgs.length > 0 ? uploadedImgs.map((img) => img.src) : [],
-        content: prompt,
-        role: "user",
-      });
-      if (err === "ERROR_OCCUR") return;
+      if (!isRegeneratingErrorResponse) {
+        // * this function will be responsible for creating chat in indexDB and in mongoDB and also update zustand local store (but only for role: user)
+        const err = await createChat({
+          activeChatRoomId,
+          fileUrls:
+            uploadedImgs.length > 0 ? uploadedImgs.map((img) => img.src) : [],
+          content: prompt,
+          role: "user",
+        });
+        if (err === "ERROR_OCCUR") return;
+      }
       // set the response loading state to true
       // setIsResponseLoading(true);
       // make the post request to the server to get the response from the LLM
@@ -113,7 +121,7 @@ Logic:
         //? this code is responsible for genereate ai response at once
         aiResponse = await llmService.getChatLlmResponse({
           prompt,
-          model: currentLLMModel.id!,
+          model: model || currentLLMModel.id!,
           fileUrls: uploadedImgs.map((img) => img.src),
           prevResponses: JSON.stringify(
             currentChatsHistory
@@ -157,20 +165,13 @@ Logic:
       }
       return content;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message, {
-          toastId: "chat request error",
-        });
-        setLLMResponsedError(
-          error.response?.data.message || "An error occurred"
-        );
-      } else {
-        setLLMResponsedError(
-          "An error occurred while sending the chat request"
-        );
-        toast.error("An error occurred while sending the chat request");
-        console.error("Error sending chat request:", error);
-      }
+      const errorMessage =
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : "An error occurred while sending the chat request";
+
+      toast.error(errorMessage);
+      setLLMResponsedError(errorMessage);
       setIsResponseLoading(false);
       return undefined;
     } finally {

@@ -1,34 +1,34 @@
 import { ArrowUp } from "lucide-react";
 import { Button } from "../ui/button";
-import useLLMRequest from "@/hooks/useLLMREquest";
-import { toast } from "react-toastify";
-import { AxiosError } from "axios";
+// import useLLMRequest from "@/hooks/useLLMREquest";
+// import { toast } from "react-toastify";
+// import { AxiosError } from "axios";
 import { useModelStore } from "@/zustand/store";
 import { AbortControllerBtn } from "./AbortControllerBtn";
 
 const SendLlmRequestBtn = ({
   prompt,
-  setPrompt,
+  handleSendChatRequest,
 }: {
   prompt: string;
-  setPrompt: (prompt: string) => void;
+  handleSendChatRequest: (prompt: string) => void;
 }) => {
-  const { getLLMResponse } = useLLMRequest();
+  // const { getLLMResponse } = useLLMRequest();
   const isResponseLoading = useModelStore((store) => store.isResponseLoading);
 
-  const handleSendChatRequest = async (prompt: string) => {
-    try {
-      if (prompt.trim()) {
-        await getLLMResponse(prompt);
-        setPrompt("");
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message);
-      }
-      console.error("Error sending chat request:", error);
-    }
-  };
+  // const handleSendChatRequest = async (prompt: string) => {
+  //   try {
+  //     if (prompt.trim()) {
+  //       await getLLMResponse(prompt);
+  //       setPrompt("");
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof AxiosError) {
+  //       toast.error(error.response?.data.message);
+  //     }
+  //     console.error("Error sending chat request:", error);
+  //   }
+  // };
 
   if (isResponseLoading) {
     return <AbortControllerBtn />;

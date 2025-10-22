@@ -3,8 +3,8 @@ import Chat from "./Chat";
 import Loading from "../utils/Loading";
 import { RefObject, useEffect } from "react";
 import ImgSkeleton from "../utils/ImgSkelaton";
-import { CircleAlert } from "lucide-react";
-import RegenerateResBtn from "../buttons/RegenerateResBtn";
+import ErrorResponse from "../ErrorResponse";
+import useErrorResponse from "@/hooks/useErrorResponse";
 
 const ChatContainer = ({
   streamResponse,
@@ -22,25 +22,11 @@ const ChatContainer = ({
   const isResponseLoading = useModelStore((store) => store.isResponseLoading);
   const imageGenerationOn = useImageStore((store) => store.imageGenerationOn);
 
+  const error = useErrorResponse();
+
   useEffect(() => {
     smoothScrollToBottom();
   }, [currentChatsHistory.length]);
-
-  // in case of error
-  if (LLMResponsedError) {
-    return (
-      <div className="flex mb-10 flex-col justity-start" ref={chatRef}>
-        <div className="text-red-500 text-left flex gap-2 items-center bg-red-500/10 px-4 mb-2 p-2 rounded-lg max-w-fit">
-          <CircleAlert className="w-6 h-6 mb-2" />
-          <p className="text-sm">
-            {LLMResponsedError ||
-              "An error occurred while processing your request."}
-          </p>
-        </div>
-        <RegenerateResBtn errorRes={Boolean(LLMResponsedError)} />
-      </div>
-    );
-  }
 
   return (
     <div className={`flex flex-col gap-4 w-full h-full`}>
@@ -64,6 +50,11 @@ const ChatContainer = ({
 
       {/* in case loading */}
       {isResponseLoading && (imageGenerationOn ? <ImgSkeleton /> : <Loading />)}
+
+      {/* in the case of error */}
+      {error && (
+        <ErrorResponse chatRef={chatRef} errorMessage={error.message} />
+      )}
     </div>
   );
 };

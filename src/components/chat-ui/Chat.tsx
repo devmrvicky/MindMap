@@ -182,10 +182,10 @@ const Chat = ({
       )}
       {chatType === "text" && (
         <ChatActionsBtns
-          message={actualResponse}
+          chat={actualResponse}
           role={message.role}
-          chatId={message.chatId}
-          model={message.content[currentActiveTabNo - 1].model}
+          // chatId={message.chatId}
+          // model={message.content[currentActiveTabNo - 1].model}
           className={` ${
             index + 1 === totalChats &&
             !isLLmResponseLoading &&

@@ -6,27 +6,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useModelStore } from "@/zustand/store";
+import { useChatStore, useModelStore } from "@/zustand/store";
 import { toast } from "react-toastify";
+import useLLMRequest from "@/hooks/useLLMREquest";
+import { AxiosError } from "axios";
 
-const RegenerateResBtn = ({
-  chatId,
-  errorRes,
-  model,
-}: {
-  chatId?: Chat["chatId"];
-  errorRes?: boolean;
-  model?: string;
-}) => {
-  const handleRegenerate = () => {
-    toast.warn(
-      "This feature is under development, please wait for the next update.",
-      {
-        toastId: "regenerate-res-btn",
+const RegenerateResBtn = () => {
+  const setIsResponseLoading = useModelStore(
+    (store) => store.setIsResponseLoading
+  );
+  const currentChatsHistory = useChatStore((s) => s.currentChatsHistory);
+  const chat: string = currentChatsHistory.at(-1)?.content[0].content || "";
+  const { getLLMResponse } = useLLMRequest();
+
+  const handleRegenerateErrorResponse = async (model?: string) => {
+    try {
+      if (!chat.trim()) return;
+      setIsResponseLoading(true);
+      await getLLMResponse({
+        prompt: chat.trim(),
+        model,
+        isRegeneratingErrorResponse: true,
+      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message);
       }
-    );
-    console.log(chatId, errorRes, model);
-    return;
+      console.error("Error sending chat request:", error);
+    }
   };
 
   return (
@@ -35,23 +42,27 @@ const RegenerateResBtn = ({
         variant="ghost"
         className=""
         title="Regenerate Response"
-        // onClick={() => handleRegenerate()}
+        onClick={() => handleRegenerateErrorResponse(chat)}
       >
         <RefreshCcw />
       </Button>
-      <ChooseModel model={model} handleRegenerate={handleRegenerate} />
+      <ChooseModel
+        handleRegenerateErrorResponse={handleRegenerateErrorResponse}
+      />
     </div>
   );
 };
 
 const ChooseModel = ({
-  model,
-  handleRegenerate,
+  // model,
+  handleRegenerateErrorResponse,
 }: {
-  model?: string;
-  handleRegenerate: (changedModel?: Partial<Model>) => void;
+  // model?: string;
+  handleRegenerateErrorResponse: (changedModel?: Model["id"]) => void;
 }) => {
   const chatModels = useModelStore((state) => state.chatModels);
+  const currentLLMModel = useModelStore((state) => state.currentLLMModel);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="btn btn-secondary btn-sm">
@@ -61,8 +72,11 @@ const ChooseModel = ({
           title="change model"
         >
           <span className="line-clamp-1 text-nowrap overflow-x-hidden whitespace-nowrap text-ellipsis">
-            {chatModels.find((chatModel) => chatModel.id === model)?.name ??
-              model}
+            {/* {chatModels.find((chatModel) => chatModel.id === model)?.name ??
+            model
+              ? model
+              : currentLLMModel.name} */}
+            {currentLLMModel.name}
           </span>
           <ChevronDown size={20} />
         </Button>
@@ -71,10 +85,10 @@ const ChooseModel = ({
         {chatModels.map((chatModel) => (
           <DropdownMenuItem
             key={chatModel.name}
-            defaultChecked={chatModel.id === model}
+            // defaultChecked={chatModel.id === model}
             onClick={() => {
               // changeCurrentLLMModel(chatModel.model);
-              handleRegenerate(chatModel);
+              handleRegenerateErrorResponse(chatModel.id);
             }}
             // defaultValue=
           >

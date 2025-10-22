@@ -1,6 +1,11 @@
 import { env } from "@/env/env";
 
-type StoreName = "chat" | "chatRoom" | "model" | "currentlyUsedModels";
+type StoreName =
+  | "chat"
+  | "chatRoom"
+  | "model"
+  | "currentlyUsedModels"
+  | "errorResponse";
 
 export default class IndexedDBService {
   private readonly DB_NAME: string;
@@ -9,8 +14,14 @@ export default class IndexedDBService {
 
   constructor() {
     this.DB_NAME = env.VITE_INDEXDB_NAME;
-    this.DB_VERSION = 3;
-    this.storeNames = ["chat", "chatRoom", "model", "currentlyUsedModels"];
+    this.DB_VERSION = 4;
+    this.storeNames = [
+      "chat",
+      "chatRoom",
+      "model",
+      "currentlyUsedModels",
+      "errorResponse",
+    ];
   }
 
   // --- Private method: open DB ---
@@ -52,6 +63,27 @@ export default class IndexedDBService {
       const store = transaction.objectStore(storeName);
       const request = store.getAll() as IDBRequest<
         Chat[] | ChatRoom[] | Model[]
+      >;
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // --- get one data ---
+  async getData({
+    storeName,
+    id,
+  }: {
+    storeName: StoreName;
+    id: string;
+  }): Promise<Chat | ChatRoom | Model | ErrorResponse> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([storeName], "readonly");
+      const store = transaction.objectStore(storeName);
+      const request = store.get(id) as IDBRequest<
+        Chat | ChatRoom | Model | ErrorResponse
       >;
 
       request.onsuccess = () => resolve(request.result);

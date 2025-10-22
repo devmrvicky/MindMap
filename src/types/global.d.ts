@@ -41,7 +41,7 @@ declare global {
 
   interface ChatModelStoreState {
     isResponseLoading: boolean;
-    LLMResponsedError: string;
+    LLMResponsedError: string | null;
     // partial Model type I want only id, name and label fields here not all Model type fields
     chatModels: Partial<Model>[];
     imageModels: Partial<Model>[];
@@ -49,11 +49,14 @@ declare global {
     chatRequestAbortController: AbortController | undefined;
 
     setIsResponseLoading: (isLoading: boolean) => void;
-    setLLMResponsedError: (error: string) => void;
+    setLLMResponsedError: (error: string | null) => void;
     changeCurrentLLMModel: (model: Partial<Model>) => void;
     toggleChatModel: (model: Partial<Model>) => void;
     setChatModels: (models: Partial<Model>[]) => void;
     setChatRequestAbortController: (controller: AbortController) => void;
+
+    isRegeneratingErrorResponse: boolean;
+    setIsRegeneratingErrorResponse: (isRegenerating: boolean) => void;
   }
 
   interface ImageUploadStoreState {
@@ -88,7 +91,7 @@ declare global {
   type ActiveChatRoom = ChatRoom | null;
 
   type storeName = "chat" | "chatRoom" | "model" | "currentlyUsedModels";
-  type Data = Chat | ChatRoom | Model | Partial<Model>;
+  type Data = Chat | ChatRoom | Model | Partial<Model> | ErrorResponse;
 
   interface Model {
     id: string;
@@ -112,6 +115,15 @@ declare global {
       internal_reasoning: string;
     };
     supported_parameters: string[];
+  }
+
+  interface ErrorResponse {
+    success: false;
+    message: string;
+    errorType: string;
+    statusCode?: number;
+    details?: any;
+    id: string;
   }
 
   interface AuthStoreState {

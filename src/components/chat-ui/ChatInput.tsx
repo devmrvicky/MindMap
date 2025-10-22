@@ -2,7 +2,7 @@ import SendLlmRequestBtn from "../buttons/SendLlmRequestBtn";
 import MicBtn from "../buttons/MicBtn";
 import ChatInputToolsPopover from "../ChatInputToolsPopover";
 import { Textarea } from "../ui/textarea";
-import { useRef } from "react";
+import React, { useRef } from "react";
 import useWebSpeech from "@/hooks/useWebSpeech";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useLLMRequest from "@/hooks/useLLMREquest";
@@ -20,6 +20,9 @@ export function ChatInput({
 }) {
   const { getLLMResponse } = useLLMRequest();
 
+  // textarea ref
+  // const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const inputContainerClass = useRef<string>("grid-cols-[auto_1fr_auto]"); // grid-cols-[1fr_1fr] grid-rows-2
   const popoverBtnClass = useRef<string>(""); // order-[2]
   const inputClass = useRef<string>(""); //  col-span-2
@@ -30,7 +33,9 @@ export function ChatInput({
   const isMobile = useIsMobile();
   const handleSendChatRequest = async (prompt: string) => {
     try {
-      await getLLMResponse(prompt);
+      if (!prompt.trim()) return;
+      setPrompt("");
+      await getLLMResponse({ prompt: prompt.trim() });
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.message);
@@ -39,9 +44,48 @@ export function ChatInput({
     }
   };
 
+  const textareaInitHeight = 64;
+  const textareaMaxHeight = 200;
+
+  const handleTextareaHeight = (textarea: HTMLTextAreaElement) => {
+    if (textarea) {
+      textarea.scrollTop = textarea.scrollHeight;
+    }
+    if (textarea.scrollHeight === textareaMaxHeight) return;
+    if (textarea.scrollHeight === textareaInitHeight) {
+      inputContainerClass.current = "grid-cols-[auto_1fr_auto]";
+      inputClass.current = "";
+      sendResponseBtnClass.current = "";
+      popoverBtnClass.current = "";
+    } else if (textarea.scrollHeight > textareaInitHeight) {
+      inputContainerClass.current =
+        "grid-cols-[auto_auto] grid-rows-[auto_auto] py-2";
+      inputClass.current = "col-span-2";
+      sendResponseBtnClass.current = "justify-end order-last";
+      popoverBtnClass.current = "order-[2]";
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const textarea = e.currentTarget as HTMLTextAreaElement;
+
+    if (e.key === "Enter" && !e.shiftKey && prompt.trim() && !isMobile) {
+      // setPrompt("");
+      handleSendChatRequest(prompt);
+    } else if (
+      (e.key === "Enter" && isMobile) ||
+      (e.key === "Enter" && e.shiftKey)
+    ) {
+      e.preventDefault();
+      setPrompt((prev) => prev + "\n");
+    }
+
+    if (!(e.key === "Enter" && !isMobile)) handleTextareaHeight(textarea);
+  };
+
   return (
     <div
-      className={`border w-full grid ${inputContainerClass.current} items-center rounded-2xl  px-2 bg-[#ECECEE] dark:bg-zinc-900/80 backdrop-blur-sm shadow-2xl`}
+      className={`border w-full grid items-center rounded-2xl  px-2 bg-[#ECECEE] dark:bg-zinc-900/80 backdrop-blur-sm shadow-2xl ${inputContainerClass.current} `}
     >
       <ChatInputToolsPopover
         setWantToImgUpload={setWantToImgUpload}
@@ -54,37 +98,16 @@ export function ChatInput({
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         ref={recognitionRef}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey && prompt.trim() && !isMobile) {
-            handleSendChatRequest(prompt);
-            setPrompt("");
-            e.currentTarget.focus();
-          } else if (
-            (e.key === "Enter" && isMobile) ||
-            (e.key === "Enter" && e.shiftKey)
-          ) {
-            e.preventDefault();
-            setPrompt((prev) => prev + "\n");
-            // update classes of popover button, textarea and send request button
-            inputContainerClass.current =
-              "grid-cols-[auto_auto] grid-rows-[auto_auto] py-2";
-            inputClass.current = "col-span-2";
-            sendResponseBtnClass.current = "justify-end order-last";
-            popoverBtnClass.current = "order-[2]";
-
-            const textarea = e.currentTarget as HTMLTextAreaElement;
-            if (textarea) {
-              textarea.scrollTop = textarea.scrollHeight;
-              console.log(textarea.scrollHeight);
-            }
-          }
-        }}
+        onKeyDown={handleKeyDown}
       />
       <div
         className={`flex items-center gap-2 ${sendResponseBtnClass.current}`}
       >
         <MicBtn setPrompt={setPrompt} />
-        <SendLlmRequestBtn prompt={prompt} setPrompt={setPrompt} />
+        <SendLlmRequestBtn
+          prompt={prompt}
+          handleSendChatRequest={handleSendChatRequest}
+        />
       </div>
     </div>
   );
