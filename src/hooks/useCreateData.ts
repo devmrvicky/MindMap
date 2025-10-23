@@ -6,10 +6,10 @@ import {
   useModelStore,
 } from "@/zustand/store";
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import { v1 as uuidv1 } from "uuid";
 import { chatRoomService } from "@/services/chatRoomService";
 import { chatService } from "@/services/chatService";
+import { errorToast, warnToast } from "@/services/toastService/toastService";
 
 interface createChatRoomProps {
   activeChatRoomId: ChatRoom["chatRoomId"];
@@ -48,7 +48,7 @@ const useCreateData = () => {
       // prevent user to create another chat room if user have already reached limit
       if (!user) {
         if (chatRooms.length >= env.VITE_FREE_CHAT_ROOMS_LIMIT) {
-          toast.warn("You need to log in to continue using MindMap app.");
+          warnToast("You need to log in to continue using MindMap app.");
           if (onLimitReached) onLimitReached();
           // throw new Error("LIMIT_RICHED");
           return "LIMIT_RICHED";
@@ -64,7 +64,7 @@ const useCreateData = () => {
       // create new chat room in indexDB and mongoDB
       await chatRoomService.createChatRoomInDB({ newChatRoom, user });
     } catch (error) {
-      toast.error(
+      errorToast(
         error instanceof AxiosError
           ? error.response?.data.message
           : "Unknown error occur"
@@ -110,7 +110,7 @@ const useCreateData = () => {
       // set the response loading state to false
       setIsResponseLoading(false);
 
-      toast.error(
+      errorToast(
         error instanceof AxiosError
           ? error.response?.data.message
           : "Unknown error occur"

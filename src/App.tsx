@@ -1,8 +1,8 @@
 import { useChatRoomStore } from "@/zustand/store.ts";
-import { ToastContainer } from "react-toastify";
 import { Outlet } from "react-router";
 import { useEffect } from "react";
 import { useAppInit } from "./hooks/useAppInit";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const chatRoomName = useChatRoomStore((s) => s.activeChatRoom?.chatRoomName);
@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <ToastContainer />
+      <Toaster />
       <Outlet />
     </div>
   );

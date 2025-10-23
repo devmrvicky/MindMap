@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { axiosConfig } from "@/api/axiosConfig";
 import { useAuthStore, useChatRoomStore } from "@/zustand/store";
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import useDeleteData from "./useDeleteData";
+import { errorToast, successToast } from "@/services/toastService/toastService";
 
 const useAuth = () => {
   const chatRooms = useChatRoomStore((s) => s.chatRooms);
@@ -23,9 +23,9 @@ const useAuth = () => {
     } catch (error) {
       console.error(error);
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message);
+        errorToast(error.response?.data.message);
       } else {
-        toast.error("An unknown error occurred.");
+        errorToast("An unknown error occurred.");
       }
     }
   };
@@ -43,19 +43,19 @@ const useAuth = () => {
       ]);
       // logout from client store
       logout();
-      toast.success("User logout successfully!", {
-        toastId: "logout successfully",
+      successToast("User logout successfully!", {
+        toasterId: "logout success",
       });
     } catch (error) {
       if (error instanceof AxiosError) {
         console.log(`Error while logout `, error.response?.data.message);
-        toast.error(error.response?.data.message, {
-          toastId: "logout failed",
+        errorToast(error.response?.data.message, {
+          toasterId: "logout failed",
         });
       } else {
         console.error("An unknown error occurred during logout:", error);
-        toast.error("An unknown error occurred during logout.", {
-          toastId: "logout failed",
+        errorToast("An unknown error occurred during logout.", {
+          toasterId: "logout failed",
         });
       }
     }

@@ -1,5 +1,5 @@
+import { errorToast } from "@/services/toastService/toastService";
 import { useRef, useState } from "react";
-import { toast } from "react-toastify";
 
 // Extend the Window interface to include SpeechRecognition types
 declare global {
@@ -62,7 +62,7 @@ const useWebSpeech = () => {
     if (
       !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
     ) {
-      toast.error("Speech recognition is not supported in this browser.");
+      errorToast("Speech recognition is not supported in this browser.");
       return;
     }
     const SpeechRecognition =

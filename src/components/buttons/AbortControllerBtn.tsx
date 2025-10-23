@@ -21,7 +21,7 @@ export const AbortControllerBtn = () => {
       title="abort request"
       onClick={handleAbortSingle}
     >
-      <span className="min-w-[14px] min-h-[14px] bg-white overflow-hidden rounded animate-pulse" />
+      <span className="min-w-[14px] min-h-[14px] dark:bg-white bg-black overflow-hidden rounded animate-pulse" />
     </Button>
   );
 };

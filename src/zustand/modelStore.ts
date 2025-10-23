@@ -3,8 +3,18 @@ import { create } from "zustand";
 const useModelStore = create<ChatModelStoreState>((set) => ({
   chatModels: [
     {
-      name: "mistralai/mistral-small-3.1-24b-instruct:free",
-      id: "mistralai/mistral-small-3.1-24b-instruct:free",
+      name: "Mistral: Mistral Small 3.2 24B",
+      id: "mistralai/mistral-small-3.2-24b-instruct:free",
+      label: "free",
+    },
+    {
+      name: "Z.AI: GLM 4.5 Air",
+      id: "z-ai/glm-4.5-air:free",
+      label: "free",
+    },
+    {
+      name: "MoonshotAI: Kimi Dev 72B",
+      id: "moonshotai/kimi-dev-72b:free",
       label: "free",
     },
   ],

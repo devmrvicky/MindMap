@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 import { axiosConfig } from "@/api/axiosConfig";
 import { Idb } from "@/services/indexDB/indexDBService"; // export singleton
 import {
@@ -8,6 +7,7 @@ import {
   useChatRoomStore,
 } from "@/zustand/store.ts";
 import { AxiosError } from "axios";
+import { errorToast } from "@/services/toastService/toastService";
 
 export function useChatRoomInit() {
   const setChatsHistory = useChatStore((s) => s.setChatsHistory);
@@ -41,10 +41,10 @@ export function useChatRoomInit() {
         setChatRooms(chatRooms);
       } catch (error) {
         if (error instanceof AxiosError) {
-          toast.error(
+          errorToast(
             error.response?.data.message || "Failed to fetch chat data",
             {
-              toastId: "chat-fetch-error",
+              toasterId: "chat-fetch-error",
             }
           );
         } else {

@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import useLLMRequest from "@/hooks/useLLMREquest";
 import { AxiosError } from "axios";
 
-const RegenerateResBtn = () => {
+const RegenerateResBtn = ({ model }: { model?: string }) => {
   const setIsResponseLoading = useModelStore(
     (store) => store.setIsResponseLoading
   );
@@ -23,6 +23,7 @@ const RegenerateResBtn = () => {
     try {
       if (!chat.trim()) return;
       setIsResponseLoading(true);
+      console.log(model);
       await getLLMResponse({
         prompt: chat.trim(),
         model,
@@ -48,16 +49,17 @@ const RegenerateResBtn = () => {
       </Button>
       <ChooseModel
         handleRegenerateErrorResponse={handleRegenerateErrorResponse}
+        model={model}
       />
     </div>
   );
 };
 
 const ChooseModel = ({
-  // model,
+  model,
   handleRegenerateErrorResponse,
 }: {
-  // model?: string;
+  model?: string;
   handleRegenerateErrorResponse: (changedModel?: Model["id"]) => void;
 }) => {
   const chatModels = useModelStore((state) => state.chatModels);
@@ -72,11 +74,7 @@ const ChooseModel = ({
           title="change model"
         >
           <span className="line-clamp-1 text-nowrap overflow-x-hidden whitespace-nowrap text-ellipsis">
-            {/* {chatModels.find((chatModel) => chatModel.id === model)?.name ??
-            model
-              ? model
-              : currentLLMModel.name} */}
-            {currentLLMModel.name}
+            {model ? model : currentLLMModel.name}
           </span>
           <ChevronDown size={20} />
         </Button>
@@ -85,12 +83,10 @@ const ChooseModel = ({
         {chatModels.map((chatModel) => (
           <DropdownMenuItem
             key={chatModel.name}
-            // defaultChecked={chatModel.id === model}
+            defaultChecked={chatModel.id === model}
             onClick={() => {
-              // changeCurrentLLMModel(chatModel.model);
               handleRegenerateErrorResponse(chatModel.id);
             }}
-            // defaultValue=
           >
             {chatModel.name}
           </DropdownMenuItem>

@@ -185,7 +185,7 @@ const Chat = ({
           chat={actualResponse}
           role={message.role}
           // chatId={message.chatId}
-          // model={message.content[currentActiveTabNo - 1].model}
+          model={message.content[currentActiveTabNo - 1].model}
           className={` ${
             index + 1 === totalChats &&
             !isLLmResponseLoading &&

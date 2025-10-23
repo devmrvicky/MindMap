@@ -9,8 +9,8 @@ import { v1 as uuidv1 } from "uuid";
 import { useParams, useNavigate } from "react-router";
 import useCreateData from "./useCreateData";
 import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 import { llmService } from "../services/llmService";
+import { errorToast } from "@/services/toastService/toastService";
 
 const useLLMRequest = () => {
   const activeChatRoom = useChatRoomStore((state) => state.activeChatRoom);
@@ -170,7 +170,7 @@ Logic:
           ? error.response?.data.message
           : "An error occurred while sending the chat request";
 
-      toast.error(errorMessage);
+      errorToast(errorMessage);
       setLLMResponsedError(errorMessage);
       setIsResponseLoading(false);
       return undefined;

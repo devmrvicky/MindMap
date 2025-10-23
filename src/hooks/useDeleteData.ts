@@ -13,9 +13,9 @@
 import { useAuthStore, useChatRoomStore, useChatStore } from "@/zustand/store";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { toast } from "react-toastify";
 import { chatRoomService } from "@/services/chatRoomService";
 import { Idb } from "@/services/indexDB/indexDBService";
+import { errorToast } from "@/services/toastService/toastService";
 
 const useDeleteData = () => {
   const [deleting, setDeleting] = useState(false);
@@ -52,8 +52,8 @@ const useDeleteData = () => {
         });
       } catch (error) {
         console.error("Error deleting chat room from MongoDB:", error);
-        toast.error("Error while deleting chats", {
-          toastId: "chatroom-delete-error",
+        errorToast("Error while deleting chats", {
+          toasterId: "chatroom-delete-error",
         });
         return;
       } finally {
@@ -77,8 +77,8 @@ const useDeleteData = () => {
       await Promise.all(deletePromises);
     } catch (error) {
       console.error("Error deleting chat room:", error);
-      toast.error("Error while deleting chats", {
-        toastId: "chatroom-delete-error",
+      errorToast("Error while deleting chats", {
+        toasterId: "chatroom-delete-error",
       });
     } finally {
       setDeleting(false);

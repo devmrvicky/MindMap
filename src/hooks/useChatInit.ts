@@ -1,11 +1,10 @@
 import { chatRoomService } from "@/services/chatRoomService";
 import { chatService } from "@/services/chatService";
 import { Idb } from "@/services/indexDB/indexDBService";
+import { errorToast } from "@/services/toastService/toastService";
 import { useAuthStore, useModelStore } from "@/zustand/store";
 import { useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
-import { toast } from "react-toastify";
-
 export const useChatInit = ({
   isSharedChatRoom,
   setCurrentChatsHistory,
@@ -54,7 +53,9 @@ export const useChatInit = ({
       }
     } catch (error) {
       console.error("Error fetching chat data:", error);
-      toast.error("Failed to fetch chat data", { toastId: "chat-fetch-error" });
+      errorToast("Failed to fetch chat data", {
+        toasterId: "chat-fetch-error",
+      });
     }
   }, [chatRoomId, user, navigate, setCurrentChatsHistory]);
 

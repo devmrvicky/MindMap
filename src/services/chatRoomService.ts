@@ -1,7 +1,7 @@
 import { axiosConfig } from "@/api/axiosConfig";
 import { Idb } from "./indexDB/indexDBService";
 import { chatService } from "./chatService";
-import { toast } from "react-toastify";
+import { successToast } from "./toastService/toastService";
 
 export default class ChatRoomService {
   async getChatRoomsFromDB() {
@@ -49,7 +49,7 @@ export default class ChatRoomService {
       if (chatRoomDeleteRes.status !== 200 && totalDeletedChats) {
         throw new Error("Failed to delete chat room");
       }
-      toast.success(totalDeletedChats + " chats deleted successfully.");
+      successToast(totalDeletedChats + " chats deleted successfully.");
       return chatRoomDeleteRes.data.data;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Unknown error");

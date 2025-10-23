@@ -4,6 +4,7 @@ import { useModelStore } from "@/zustand/store.ts";
 
 export function useModelsInit() {
   const setChatModels = useModelStore((s) => s.setChatModels);
+  const chatModels = useModelStore((s) => s.chatModels);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -11,7 +12,7 @@ export function useModelsInit() {
         const models = (await Idb.getAllData({
           storeName: "currentlyUsedModels",
         })) as Partial<Model>[];
-        setChatModels(models);
+        setChatModels(models.length ? models : chatModels);
       } catch (err) {
         console.error("Failed to load models from IndexedDB:", err);
         setChatModels([]); // fallback to empty

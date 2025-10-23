@@ -9,10 +9,12 @@ const ChatActionsBtns = ({
   chat,
   className,
   role,
+  model,
 }: {
   chat: string;
   className: string;
   role: "user" | "assistant";
+  model: string;
 }) => {
   return (
     <div
@@ -24,7 +26,7 @@ const ChatActionsBtns = ({
       {/* more option button */}
       {role === "assistant" && (
         <MoreOptionPopover>
-          <RegenerateResBtn />
+          <RegenerateResBtn model={model} />
         </MoreOptionPopover>
       )}
     </div>

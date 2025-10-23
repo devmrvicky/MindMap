@@ -30,7 +30,6 @@ const ChatUI = () => {
   const { isScrollUp } = useScrollDetection();
 
   const smoothScrollToBottom = () => {
-    console.log(chatRef);
     setTimeout(() => {
       if (chatRef.current) {
         chatRef.current.scrollIntoView({ behavior: "smooth" });
@@ -74,7 +73,7 @@ const ChatUI = () => {
         {!chatRoomId && <GreetingMessageComp />}
 
         {chatRoomId &&
-          ((currentChatsHistory.length > 0) ? (
+          (currentChatsHistory.length > 0 ? (
             <ChatContainer
               streamResponse=""
               chatRef={chatRef}
